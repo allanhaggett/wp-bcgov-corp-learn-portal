@@ -1,6 +1,7 @@
 <?php
 /**
- * The template for displaying all single posts
+ * The template for displaying all pages of the Course content type. This is primarily
+ * a copy of Twenty_Twenty_One's single.php but with added stuff in there.
  *
  * @link https://developer.wordpress.org/themes/basics/template-hierarchy/#single-post
  *
@@ -25,9 +26,16 @@ while ( have_posts() ) :
 
 	<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
 	<?php twenty_twenty_one_post_thumbnail(); ?>
+
 </header>
 
 <div class="entry-content">
+
+	<div><?php the_terms( $post->ID, 'course_catagory', 'Categories: ', ', ', ' ' ); ?></div>
+	<div><?php the_terms( $post->ID, 'delivery_method', 'Delivery Methods: ', ', ', ' ' ); ?></div>
+	<div><?php the_terms( $post->ID, 'role', 'Roles: ', ', ', ' ' ); ?></div>
+	<div><?php the_terms( $post->ID, 'program', 'Programs: ', ', ', ' ' ); ?></div>
+
 	<?php
 	the_content();
 
@@ -40,12 +48,6 @@ while ( have_posts() ) :
 		)
 	);
 	?>
-
-	<div><?php the_terms( $post->ID, 'delivery_method', 'Delivery Methods: ', ', ', ' ' ); ?></div>
-	<div><?php the_terms( $post->ID, 'role', 'Roles: ', ', ', ' ' ); ?></div>
-	<div><?php the_terms( $post->ID, 'program', 'Programs: ', ', ', ' ' ); ?></div>
-
-
 </div><!-- .entry-content -->
 
 <footer class="entry-footer default-max-width">

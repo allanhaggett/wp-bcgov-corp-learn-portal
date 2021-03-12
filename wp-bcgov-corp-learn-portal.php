@@ -9,14 +9,14 @@ Author URI: https://learningcentre.gww.gov.bc.ca
 */
 
 /**
- * This plugin sticks to simply enabling a custom content type, and
- * several custom taxonomies to along with it. We'll create a "course" type,
- * and associate taxonomies such as Roles, Programs, and 
- * Delivery Methods. We'll set Courses a 'page' type, so that we can also leverage
- * parent/child relationships if we want to.
+ * This plugin enables a custom content type, and several custom taxonomies to along 
+ * with it. We'll create a "course" type and associate taxonomies such as Roles, 
+ * Programs, and Delivery Methods. We'll set Courses as a 'page' type, so that we can 
+ * also leverage parent/child relationships if we want to.
  * We will also enable custom fields to capture information such as "how to register" 
  * on a item-by-item basis, and create custom meta boxes to better manage the UI
  * for admin folx.
+ * Lastly, we provide page templates for the type, both single view and main archives.
  * 
  * Much of this code is copypasta from:
  * https://www.smashingmagazine.com/2012/11/complete-guide-custom-post-types/
@@ -70,6 +70,31 @@ add_action( 'init', 'my_custom_post_course' );
  */
 
 /**
+ * Course Categories
+ */
+function my_taxonomies_course_category() {
+    $labels = array(
+        'name'              => _x( 'Course Categories', 'taxonomy general name' ),
+        'singular_name'     => _x( 'Course Category', 'taxonomy singular name' ),
+        'search_items'      => __( 'Search Course Categories' ),
+        'all_items'         => __( 'All Course Categories' ),
+        'parent_item'       => __( 'Parent Course Category' ),
+        'parent_item_colon' => __( 'Parent Course Category:' ),
+        'edit_item'         => __( 'Edit Course Category' ), 
+        'update_item'       => __( 'Update Course Category' ),
+        'add_new_item'      => __( 'Add New Course Category' ),
+        'new_item_name'     => __( 'New Course Category' ),
+        'menu_name'         => __( 'Course Categories' ),
+    );
+    $args = array(
+        'labels' => $labels,
+        'hierarchical' => true,
+        'show_in_rest' => true,
+    );
+    register_taxonomy( 'course_catagory', 'course', $args );
+}
+
+/**
  * Delivery Methods
  */
 function my_taxonomies_course_delivery_method() {
@@ -93,7 +118,6 @@ function my_taxonomies_course_delivery_method() {
     );
     register_taxonomy( 'delivery_method', 'course', $args );
 }
-
 
 /** 
  * Course best suited to a role
@@ -148,6 +172,7 @@ function my_taxonomies_course_program() {
 /** 
  * Now let's initiate all of those awesome taxonomies!
  */
+add_action( 'init', 'my_taxonomies_course_category', 0 );
 add_action( 'init', 'my_taxonomies_course_delivery_method', 0 );
 add_action( 'init', 'my_taxonomies_course_role', 0 );
 add_action( 'init', 'my_taxonomies_course_program', 0 );
@@ -169,6 +194,10 @@ function load_course_template( $template ) {
          */
         return plugin_dir_path( __FILE__ ) . 'single-course.php';
     }
+    /** 
+     * #TODO extend this to include archive.php for main index page
+     * and maybe possibly also taxonomy pages?
+     */
 
     return $template;
 }
