@@ -19,12 +19,18 @@ Author URI: https://learning.gww.gov.bc.ca
  * We provide page templates for the type, both single view and main archives.
  * 
  * There is also system-specific synchronization methods, starting with the 
- * PSA Learning System. 
+ * PSA Learning System (ELM).
  * - Make private all courses within the defined "Source System" taxonomy. 
  * - Read a specific feed of courses from a source system
  * - Loop through each one:
- *     - Does the course already exist here? Update it (whether it needs it or not?)
- *     - Make it visible again
+ *     - Does the course already exist here? 
+ *         - If yes, does anything need updating?
+ *             - Update and publish
+ *         - If no, simply publish
+ *     - If no, create and publish
+ * - **Note again that if the course exists in the system, but not the feed,
+ *   then we retain the record of there once having been a course from that 
+ *   source, but it is kept as "private" so it's removed from public view here. 
  * 
  */
 
@@ -72,13 +78,14 @@ add_action( 'init', 'my_custom_post_course' );
 
 
 /**
- * Start applying various taxonomies; start with the methods, then init them all in one place
+ * Start applying various taxonomies; start with the methods, 
+ * then init them all in one place
  */
 
 /**
- * Source System. Courses can synchronize from multiple different source systems; e.g. PSA Learning System
- * We use this taxonomy to keep things fresh between them, so we can update/add/remove courses within 
- * each system separately.
+ * Source System. Courses can synchronize from multiple different source systems; 
+ * e.g. PSA Learning System We use this taxonomy to keep things fresh between them, 
+ * so we can update/add/remove courses within each system separately.
  */
 function my_taxonomies_source_system() {
     $labels = array(
@@ -214,6 +221,10 @@ add_action( 'init', 'my_taxonomies_course_program', 0 );
 /**
  * Now let's make sure that we're using our own customized template
  * so that courses can show the meta data in a customizable fashion.
+ *  
+ * #TODO extend this to include archive.php for main index page
+ * and also taxonomy pages
+ * 
  */
 function load_course_template( $template ) {
     global $post;
@@ -227,10 +238,6 @@ function load_course_template( $template ) {
          */
         return plugin_dir_path( __FILE__ ) . 'single-course.php';
     }
-    /** 
-     * #TODO extend this to include archive.php for main index page
-     * and maybe possibly also taxonomy pages?
-     */
 
     return $template;
 }
@@ -259,10 +266,9 @@ function course_elm_sync() {
 		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 	}
     echo '<h1>Why hello there.</h1>';
-    echo '<h2>If you are seeing this, you have just updated all courses to be "Private" and thus not publicly visible.</h2>';
+    echo '<h2>If you are seeing this, you have just updated all courses to be "Private" ';
+    echo 'and thus not publicly visible.</h2>';
     echo '<p>Please just bear with Allan as we implement this feature.</p>';
-
-
     /**
      * First let's make every page private so that if the course is no longer in the catalog, 
      * that it gets removed from the listing here. Note that we're just making these courses
