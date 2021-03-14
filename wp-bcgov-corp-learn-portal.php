@@ -5,7 +5,7 @@ Plugin URI: https://github.com/allanhaggett/wp-bcgov-corp-learn-portal
 Description: A gateway to everything that BC Gov has to offer for learning opportunities.
 Author: Allan Haggett <allan.haggett@gov.bc.ca>
 Version: 1
-Author URI: https://learningcentre.gww.gov.bc.ca
+Author URI: https://learning.gww.gov.bc.ca
 */
 
 /**
@@ -16,10 +16,16 @@ Author URI: https://learningcentre.gww.gov.bc.ca
  * We will also enable custom fields to capture information such as "how to register" 
  * on a item-by-item basis, and create custom meta boxes to better manage the UI
  * for admin folx.
- * Lastly, we provide page templates for the type, both single view and main archives.
+ * We provide page templates for the type, both single view and main archives.
  * 
- * Much of this code is copypasta from:
- * https://www.smashingmagazine.com/2012/11/complete-guide-custom-post-types/
+ * There is also system-specific synchronization methods, starting with the 
+ * PSA Learning System. 
+ * - Make private all courses within the defined "Source System" taxonomy. 
+ * - Read a specific feed of courses from a source system
+ * - Loop through each one:
+ *     - Does the course already exist here? Update it (whether it needs it or not?)
+ *     - Make it visible again
+ * 
  */
 
 /**
@@ -70,6 +76,33 @@ add_action( 'init', 'my_custom_post_course' );
  */
 
 /**
+ * Source System. Courses can synchronize from multiple different source systems; e.g. PSA Learning System
+ * We use this taxonomy to keep things fresh between them, so we can update/add/remove courses within 
+ * each system separately.
+ */
+function my_taxonomies_source_system() {
+    $labels = array(
+        'name'              => _x( 'Source Systems', 'taxonomy general name' ),
+        'singular_name'     => _x( 'Source Systems', 'taxonomy singular name' ),
+        'search_items'      => __( 'Search Source Systems' ),
+        'all_items'         => __( 'All Source Systems' ),
+        'parent_item'       => __( 'Parent Source System' ),
+        'parent_item_colon' => __( 'Parent Source System:' ),
+        'edit_item'         => __( 'Edit Source System' ), 
+        'update_item'       => __( 'Update Source System' ),
+        'add_new_item'      => __( 'Add New Source System' ),
+        'new_item_name'     => __( 'New Source System' ),
+        'menu_name'         => __( 'Source Systems' ),
+    );
+    $args = array(
+        'labels' => $labels,
+        'hierarchical' => false,
+        'show_in_rest' => true,
+    );
+    register_taxonomy( 'source_system', 'course', $args );
+}
+
+/**
  * Course Categories
  */
 function my_taxonomies_course_category() {
@@ -91,7 +124,7 @@ function my_taxonomies_course_category() {
         'hierarchical' => true,
         'show_in_rest' => true,
     );
-    register_taxonomy( 'course_catagory', 'course', $args );
+    register_taxonomy( 'course_category', 'course', $args );
 }
 
 /**
@@ -172,11 +205,11 @@ function my_taxonomies_course_program() {
 /** 
  * Now let's initiate all of those awesome taxonomies!
  */
+add_action( 'init', 'my_taxonomies_source_system', 0 );
 add_action( 'init', 'my_taxonomies_course_category', 0 );
 add_action( 'init', 'my_taxonomies_course_delivery_method', 0 );
 add_action( 'init', 'my_taxonomies_course_role', 0 );
 add_action( 'init', 'my_taxonomies_course_program', 0 );
-
 
 /**
  * Now let's make sure that we're using our own customized template
@@ -203,3 +236,93 @@ function load_course_template( $template ) {
 }
 
 add_filter( 'single_template', 'load_course_template' );
+
+
+function course_menu() {
+	add_submenu_page(
+		'edit.php?post_type=course',
+		__( 'ELM Sync', 'elm-sync' ),
+		__( 'ELM Sync', 'elm-sync' ),
+		'elm-sync',
+		'elm-sync',
+		'course_elm_sync'
+	);
+}
+add_action( 'admin_menu', 'course_menu' );
+
+/**
+ * Synchronize with the public feed for the PSA Learning System (ELM)
+ */
+function course_elm_sync() {
+
+	if ( !current_user_can( 'manage_options' ) )  {
+		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+	}
+    echo '<h1>Why hello there.</h1>';
+    echo '<h2>If you are seeing this, you have just updated all courses to be "Private" and thus not publicly visible.</h2>';
+    echo '<p>Please just bear with Allan as we implement this feature.</p>';
+
+
+    /**
+     * First let's make every page private so that if the course is no longer in the catalog, 
+     * that it gets removed from the listing here. Note that we're just making these courses
+     * private, and NOT deleting them. We're going to loop through the source catalog after 
+     * this, and if the post already exists and nothing has changed, then we just make it 
+     * published again and move on.
+     * 
+     * The term_id for the "PSA Learning System" category in the "Source System" taxonomy
+     * is 14; you may need to change this value if it changes as we move betwixt platforms.
+     */
+    $all_posts = get_posts(array(
+        'post_type' => 'course',
+        'numberposts' => -1,
+        'tax_query' => array(
+            array(
+            'taxonomy' => 'source_system',
+            'field' => 'term_id',
+            'terms' => 14)
+        ))
+    );
+    foreach ($all_posts as $single_post){
+        $single_post->post_status = 'private';
+        wp_update_post( $single_post );
+    }
+    /**
+     * Now that all those courses are private, let's grab the public listing of courses from 
+     * the PSA Learning System and loop through those, updating existing ones as required 
+     * and publishing new ones.
+     */
+    $feed = file_get_contents('https://learn.bcpublicservice.gov.bc.ca/learningcentre/courses/feed.json');
+    $courses = json_decode($feed);
+    echo '<div>' . count($courses->items) . ' Courses.</div>';
+    foreach($courses->items as $course) {
+
+        if(!empty($course->title)) {
+            $new_course = array(
+                'post_title' => $course->title,
+                'post_type' => 'course',
+                'post_status' => 'publish', 
+                'post_content' => $course->summary,
+                'post_excerpt' => substr($course->summary, 0, 100)
+            );
+            $existing = post_exists($course->title);
+            if($existing) {
+                echo 'ID: ' . $existing . ' ' . $course->title . ' ALREADY EXISTS<br>';
+                //#TODO check all relevent values to see if any of them have been updated
+                // and update the page if necessary
+                // $single_post->post_status = 'private';
+                // wp_update_post( $single_post );
+            } else {
+                $post_id = wp_insert_post( $new_course );
+                wp_set_object_terms( $post_id, 'PSA Learning System', 'source_system', true);
+                $cats = explode(',', $course->tags);
+                foreach($cats as $cat) {
+                    wp_set_object_terms( $post_id, $cat, 'course_category', true);
+                }
+                echo $post_id . ' - ' . $course->title . ' Created<br>';
+            }
+
+            
+        }
+    }
+}
