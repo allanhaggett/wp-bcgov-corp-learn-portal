@@ -8,7 +8,8 @@ This plugin enables a custom content type, and several custom taxonomies to alon
 with it. We'll create a "course" type and associate taxonomies such as Roles, 
 Programs, and Delivery Methods. 
 
-We'll set Courses as a 'page' type, so that we can also leverage parent/child relationships if we want to.
+We'll set Courses as a 'page' type, so that we can also leverage parent/child 
+relationships if we want to.
 
 We will also enable custom fields to capture information such as "how to register" 
 on a item-by-item basis, and create custom meta boxes to better manage the UI
