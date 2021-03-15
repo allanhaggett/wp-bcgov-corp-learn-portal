@@ -31,6 +31,7 @@ while ( have_posts() ) :
 
 <div class="entry-content">
 
+	<div><?php the_terms( $post->ID, 'source_system', 'Source system: ', ', ', ' ' ); ?></div>
 	<div><?php the_terms( $post->ID, 'course_category', 'Categories: ', ', ', ' ' ); ?></div>
 	<div><?php the_terms( $post->ID, 'delivery_method', 'Delivery Methods: ', ', ', ' ' ); ?></div>
 	<div><?php the_terms( $post->ID, 'role', 'Roles: ', ', ', ' ' ); ?></div>
@@ -39,6 +40,17 @@ while ( have_posts() ) :
 	<?php
 	the_content();
 	?>
+
+	<div>
+	<a style="font-size: 2rem" 
+		href="<?= $post->course_link ?>" 
+		target="_blank" 
+		rel="noopener">
+			Register Here
+	</a>
+	</div>
+
+
 </div><!-- .entry-content -->
 
 <footer class="entry-footer default-max-width">

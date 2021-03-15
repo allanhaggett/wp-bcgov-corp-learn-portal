@@ -212,11 +212,12 @@ function my_taxonomies_course_program() {
 /** 
  * Now let's initiate all of those awesome taxonomies!
  */
-add_action( 'init', 'my_taxonomies_source_system', 0 );
+
 add_action( 'init', 'my_taxonomies_course_category', 0 );
 add_action( 'init', 'my_taxonomies_course_delivery_method', 0 );
 add_action( 'init', 'my_taxonomies_course_role', 0 );
 add_action( 'init', 'my_taxonomies_course_program', 0 );
+add_action( 'init', 'my_taxonomies_source_system', 0 );
 
 /**
  * Now let's make sure that we're using our own customized template
@@ -228,7 +229,6 @@ add_action( 'init', 'my_taxonomies_course_program', 0 );
  */
 function load_course_template( $template ) {
     global $post;
-
     if ( 'course' === $post->post_type && locate_template( array( 'single-course.php' ) ) !== $template ) {
         /*
          * This is a 'course' page
@@ -238,12 +238,28 @@ function load_course_template( $template ) {
          */
         return plugin_dir_path( __FILE__ ) . 'single-course.php';
     }
-
     return $template;
 }
 
-add_filter( 'single_template', 'load_course_template' );
+function course_archive_template( $archive_template ) {
+     global $post;
+     if ( is_post_type_archive ( 'course' ) ) {
+          $archive_template = dirname( __FILE__ ) . '/archive-course.php';
+     }
+     return $archive_template;
+}
 
+function course_tax_template( $tax_template ) {
+    global $post;
+    if ( is_tax ( 'course_category' ) ) {
+         $tax_template = dirname( __FILE__ ) . '/taxonomy.php';
+    }
+    return $tax_template;
+}
+
+add_filter( 'single_template', 'load_course_template' );
+add_filter( 'archive_template', 'course_archive_template');
+add_filter( 'taxonomy_template', 'course_tax_template');
 
 function course_menu() {
 	add_submenu_page(
@@ -265,10 +281,15 @@ function course_elm_sync() {
 	if ( !current_user_can( 'manage_options' ) )  {
 		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 	}
-    echo '<h1>Why hello there.</h1>';
-    echo '<h2>If you are seeing this, you have just updated all courses to be "Private" ';
-    echo 'and thus not publicly visible.</h2>';
-    echo '<p>Please just bear with Allan as we implement this feature.</p>';
+    echo '<h1>PSA Learning System - Synchronize</h1>';
+    echo '<p>Here we make all courses from <a href="';
+    echo 'edit-tags.php?taxonomy=source_system&post_type=course';
+    echo '">this source system</a> private so that we can selectively reenable them ';
+    echo 'whem we read the PSA Learning System public feed of courses and compare it ';
+    echo 'to what we already have. If the course exists, we check for updates and make ';
+    echo 'those accordingly. If the course does not exist, we create it.</p>';
+    echo '<p><strong>*NOTE</strong> that if the course existed previously, but is now no ';
+    echo 'longer in the feed, it will remain set to "private" and not published on the site.</p>';
     /**
      * First let's make every page private so that if the course is no longer in the catalog, 
      * that it gets removed from the listing here. Note that we're just making these courses
@@ -300,27 +321,35 @@ function course_elm_sync() {
      */
     $feed = file_get_contents('https://learn.bcpublicservice.gov.bc.ca/learningcentre/courses/feed.json');
     $courses = json_decode($feed);
-    echo '<div>' . count($courses->items) . ' Courses.</div>';
+    echo '<h3>' . count($courses->items) . ' Courses.</h3>';
     foreach($courses->items as $course) {
 
         if(!empty($course->title)) {
-            $new_course = array(
-                'post_title' => $course->title,
-                'post_type' => 'course',
-                'post_status' => 'publish', 
-                'post_content' => $course->summary,
-                'post_excerpt' => substr($course->summary, 0, 100)
-            );
             $existing = post_exists($course->title);
             if($existing) {
                 echo 'ID: ' . $existing . ' ' . $course->title . ' ALREADY EXISTS<br>';
-                //#TODO check all relevent values to see if any of them have been updated
-                // and update the page if necessary
-                // $single_post->post_status = 'private';
-                // wp_update_post( $single_post );
+                $existingcourse = get_post($existing);
+                if($existingcourse->description != $course->summary) {
+                    $existingcourse->description = $course->summary;
+                }
+                $existingcourse->post_status = 'publish';
+                wp_update_post( $existingcourse );
+                echo $existingcourse->title . ' Updated<br>';
             } else {
+                $new_course = array(
+                    'post_title' => $course->title,
+                    'post_type' => 'course',
+                    'post_status' => 'publish', 
+                    'post_content' => $course->summary,
+                    'post_excerpt' => substr($course->summary, 0, 100),
+                    'meta_input'   => array(
+                        'course_link' => $course->url,
+                        'elm_course_code' => $course->id
+                    )
+                );
                 $post_id = wp_insert_post( $new_course );
-                wp_set_object_terms( $post_id, 'PSA Learning System', 'source_system', true);
+                wp_set_object_terms( $post_id, 'PSA Learning System', 'source_system', false);
+                wp_set_object_terms( $post_id, $course->delivery_method, 'delivery_method', false);
                 $cats = explode(',', $course->tags);
                 foreach($cats as $cat) {
                     wp_set_object_terms( $post_id, $cat, 'course_category', true);
@@ -332,3 +361,29 @@ function course_elm_sync() {
         }
     }
 }
+
+// First we create a function
+function list_terms_custom_taxonomy( $atts ) {
+ 
+    // Inside the function we extract custom taxonomy parameter of our shortcode
+    extract( shortcode_atts( array(
+        'custom_taxonomy' => '',
+    ), $atts ) );
+     
+    // arguments for function wp_list_categories
+    $args = array( 
+            'taxonomy' => $custom_taxonomy,
+            'title_li' => ''
+    );
+     
+    // We wrap it in unordered list 
+    echo '<ul>'; 
+    echo wp_list_categories($args);
+    echo '</ul>';
+}
+
+// Add a shortcode that executes our function
+add_shortcode( 'ct_terms', 'list_terms_custom_taxonomy' );
+
+//Allow Text widgets to execute shortcodes
+add_filter('widget_text', 'do_shortcode');
