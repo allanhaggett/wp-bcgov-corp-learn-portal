@@ -20,8 +20,8 @@ Author URI: https://learning.gww.gov.bc.ca
  * 
  * There is also system-specific synchronization methods, starting with the 
  * PSA Learning System (ELM).
- * - Make private all courses within the defined "Source System" taxonomy. 
- * - Read a specific feed of courses from a source system
+ * - Make private all courses within the defined "Learning Partner" taxonomy. 
+ * - Read a specific feed of courses from a Learning Partner
  * - Loop through each one:
  *     - Does the course already exist here? 
  *         - If yes, does anything need updating?
@@ -69,8 +69,8 @@ function my_custom_post_course() {
         'can_export'          => true,
         'show_in_menu'        => true,
         'menu_position'       => 5,
-        'supports'            => array( 'title', 'editor', 'thumbnail', 'custom-fields' ),
-        
+        'supports'            => array( 'title', 'editor', 'thumbnail' ),
+        // , 'custom-fields'        
     );
     register_post_type( 'course', $args ); 
 }
@@ -83,30 +83,30 @@ add_action( 'init', 'my_custom_post_course' );
  */
 
 /**
- * Source System. Courses can synchronize from multiple different source systems; 
- * e.g. PSA Learning System We use this taxonomy to keep things fresh between them, 
+ * Learning Partner. Courses can synchronize from multiple different Learning Partners; 
+ * e.g. PSA Learning System We use this taxonomy to keep things fresh with that system, 
  * so we can update/add/remove courses within each system separately.
  */
-function my_taxonomies_source_system() {
+function my_taxonomies_learning_partner() {
     $labels = array(
-        'name'              => _x( 'Source Systems', 'taxonomy general name' ),
-        'singular_name'     => _x( 'Source Systems', 'taxonomy singular name' ),
-        'search_items'      => __( 'Search Source Systems' ),
-        'all_items'         => __( 'All Source Systems' ),
-        'parent_item'       => __( 'Parent Source System' ),
-        'parent_item_colon' => __( 'Parent Source System:' ),
-        'edit_item'         => __( 'Edit Source System' ), 
-        'update_item'       => __( 'Update Source System' ),
-        'add_new_item'      => __( 'Add New Source System' ),
-        'new_item_name'     => __( 'New Source System' ),
-        'menu_name'         => __( 'Source Systems' ),
+        'name'              => _x( 'Learning Partners', 'taxonomy general name' ),
+        'singular_name'     => _x( 'Learning Partners', 'taxonomy singular name' ),
+        'search_items'      => __( 'Search Learning Partners' ),
+        'all_items'         => __( 'All Learning Partners' ),
+        'parent_item'       => __( 'Parent Learning Partner' ),
+        'parent_item_colon' => __( 'Parent Learning Partner:' ),
+        'edit_item'         => __( 'Edit Learning Partner' ), 
+        'update_item'       => __( 'Update Learning Partner' ),
+        'add_new_item'      => __( 'Add New Learning Partner' ),
+        'new_item_name'     => __( 'New Learning Partner' ),
+        'menu_name'         => __( 'Learning Partners' ),
     );
     $args = array(
         'labels' => $labels,
         'hierarchical' => false,
         'show_in_rest' => true,
     );
-    register_taxonomy( 'source_system', 'course', $args );
+    register_taxonomy( 'learning_partner', 'course', $args );
 }
 
 /**
@@ -217,7 +217,7 @@ add_action( 'init', 'my_taxonomies_course_category', 0 );
 add_action( 'init', 'my_taxonomies_course_delivery_method', 0 );
 add_action( 'init', 'my_taxonomies_course_role', 0 );
 add_action( 'init', 'my_taxonomies_course_program', 0 );
-add_action( 'init', 'my_taxonomies_source_system', 0 );
+add_action( 'init', 'my_taxonomies_learning_partner', 0 );
 
 /**
  * Now let's make sure that we're using our own customized template
@@ -284,7 +284,7 @@ function course_elm_sync() {
     echo '<h1>PSA Learning System - Synchronize</h1>';
     echo '<p>Here we make all courses from <a href="';
     echo 'edit-tags.php?taxonomy=source_system&post_type=course';
-    echo '">this source system</a> private so that we can selectively reenable them ';
+    echo '">this Learning Partner</a> private so that we can selectively reenable them ';
     echo 'whem we read the PSA Learning System public feed of courses and compare it ';
     echo 'to what we already have. If the course exists, we check for updates and make ';
     echo 'those accordingly. If the course does not exist, we create it.</p>';
@@ -297,7 +297,7 @@ function course_elm_sync() {
      * this, and if the post already exists and nothing has changed, then we just make it 
      * published again and move on.
      * 
-     * The term_id for the "PSA Learning System" category in the "Source System" taxonomy
+     * The term_id for the "PSA Learning System" category in the "Learning Partner" taxonomy
      * is 14; you may need to change this value if it changes as we move betwixt platforms.
      */
     $all_posts = get_posts(array(
@@ -305,9 +305,9 @@ function course_elm_sync() {
         'numberposts' => -1,
         'tax_query' => array(
             array(
-            'taxonomy' => 'source_system',
+            'taxonomy' => 'learning_partner',
             'field' => 'term_id',
-            'terms' => 14)
+            'terms' => 50)
         ))
     );
     foreach ($all_posts as $single_post){
@@ -348,7 +348,7 @@ function course_elm_sync() {
                     )
                 );
                 $post_id = wp_insert_post( $new_course );
-                wp_set_object_terms( $post_id, 'PSA Learning System', 'source_system', false);
+                wp_set_object_terms( $post_id, 'PSA Learning System', 'learning_partner  ', false);
                 wp_set_object_terms( $post_id, $course->delivery_method, 'delivery_method', false);
                 $cats = explode(',', $course->tags);
                 foreach($cats as $cat) {
@@ -387,3 +387,80 @@ add_shortcode( 'ct_terms', 'list_terms_custom_taxonomy' );
 
 //Allow Text widgets to execute shortcodes
 add_filter('widget_text', 'do_shortcode');
+
+/* Fire our meta box setup function on the post editor screen. */
+add_action( 'load-post.php', 'courses_meta_boxes_setup' );
+add_action( 'load-post-new.php', 'courses_meta_boxes_setup' );
+
+/* Meta box setup function. */
+function courses_meta_boxes_setup() {
+
+    /* Add meta boxes on the 'add_meta_boxes' hook. */
+    add_action( 'add_meta_boxes', 'courses_add_post_meta_boxes' );
+    /* Save post meta on the 'save_post' hook. */
+    add_action( 'save_post', 'course_save_course_link_meta', 10, 2 );
+}
+
+/* Create one or more meta boxes to be displayed on the post editor screen. */
+function courses_add_post_meta_boxes() {
+
+    add_meta_box(
+        'course-link',      // Unique ID
+        esc_html__( 'Course Link', 'course-link' ),    // Title
+        'course_link_meta_box',   // Callback function
+        'course',         // Admin page (or post type)
+        'side',         // Context
+        'default'         // Priority
+    );
+}
+/* Display the post meta box. */
+function course_link_meta_box( $post ) { ?>
+
+    <?php wp_nonce_field( basename( __FILE__ ), 'course_link_nonce' ); ?>
+    <div>
+        <label for="course-link">
+        <?php _e( "A hyperlink to the session registration page for this course.", 'course-link' ); ?></label>
+        <br />
+        <input class="widefat" 
+                type="text" 
+                name="course-link" 
+                id="course-link" 
+                value="<?php echo esc_attr( get_post_meta( $post->ID, 'course_link', true ) ); ?>" 
+                size="30" />
+    </div>
+<?php }
+
+/* Save a meta box’s post metadata. */
+function course_save_course_link_meta ( $post_id, $post ) {
+
+    /* Verify the nonce before proceeding. */
+    if ( !isset( $_POST['course_link_nonce'] ) || !wp_verify_nonce( $_POST['course_link_nonce'], basename( __FILE__ ) ) ) {
+        return $post_id;
+    }
+    /* Get the post type object. */
+    $post_type = get_post_type_object( $post->post_type );
+
+    /* Check if the current user has permission to edit the post. */
+    if ( !current_user_can( $post_type->cap->edit_post, $post_id ) )
+    return $post_id;
+
+    /* Get the posted data */
+    $new_meta_value = ( isset( $_POST['course-link'] ) ? $_POST['course-link'] : ’ );
+
+    /* Get the meta key. */
+    $meta_key = 'course_link';
+
+    /* Get the meta value of the custom field key. */
+    $meta_value = get_post_meta( $post_id, $meta_key, true );
+
+    /* If a new meta value was added and there was no previous value, add it. */
+    if ( $new_meta_value && ’ == $meta_value ) {
+        add_post_meta( $post_id, $meta_key, $new_meta_value, true );
+    /* If the new meta value does not match the old value, update it. */
+    } elseif ( $new_meta_value && $new_meta_value != $meta_value ) {
+        update_post_meta( $post_id, $meta_key, $new_meta_value );
+    /* If there is no new meta value but an old value exists, delete it. */
+    } elseif ( ’ == $new_meta_value && $meta_value ) {
+        delete_post_meta( $post_id, $meta_key, $meta_value );
+    }
+}

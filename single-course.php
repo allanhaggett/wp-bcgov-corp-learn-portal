@@ -31,7 +31,7 @@ while ( have_posts() ) :
 
 <div class="entry-content">
 
-	<div><?php the_terms( $post->ID, 'source_system', 'Source system: ', ', ', ' ' ); ?></div>
+	<div><?php the_terms( $post->ID, 'learning_partner', 'Learning Partner: ', ', ', ' ' ); ?></div>
 	<div><?php the_terms( $post->ID, 'course_category', 'Categories: ', ', ', ' ' ); ?></div>
 	<div><?php the_terms( $post->ID, 'delivery_method', 'Delivery Methods: ', ', ', ' ' ); ?></div>
 	<div><?php the_terms( $post->ID, 'role', 'Roles: ', ', ', ' ' ); ?></div>
