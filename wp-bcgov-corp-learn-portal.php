@@ -295,10 +295,12 @@ function course_elm_sync() {
      * that it gets removed from the listing here. Note that we're just making these courses
      * private, and NOT deleting them. We're going to loop through the source catalog after 
      * this, and if the post already exists and nothing has changed, then we just make it 
-     * published again and move on.
+     * published again and move on. We could just delete them, and may change to that in 
+     * the future, depending on feedback.
      * 
      * The term_id for the "PSA Learning System" category in the "Learning Partner" taxonomy
      * is 14; you may need to change this value if it changes as we move betwixt platforms.
+     * #TODO perhaps make this a slug-based query?
      */
     $all_posts = get_posts(array(
         'post_type' => 'course',
@@ -322,6 +324,12 @@ function course_elm_sync() {
     $feed = file_get_contents('https://learn.bcpublicservice.gov.bc.ca/learningcentre/courses/feed.json');
     $courses = json_decode($feed);
     echo '<h3>' . count($courses->items) . ' Courses.</h3>';
+    /**
+     * #TODO Note that course titles have a convention for courses which are restricted to certain groups:
+     * {RESTRICTED TO MinX and TEAMS}
+     * I think that it would good to parse these strings out into taxonomy terms, making it easier
+     * to look up courses for a given Ministry.
+     */
     foreach($courses->items as $course) {
 
         if(!empty($course->title)) {
