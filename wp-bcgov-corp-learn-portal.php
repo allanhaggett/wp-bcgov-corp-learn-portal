@@ -270,6 +270,14 @@ function course_menu() {
 		'elm-sync',
 		'course_elm_sync'
 	);
+	add_submenu_page(
+		'edit.php?post_type=course',
+		__( 'iHub Sync', 'ihub-sync' ),
+		__( 'iHub Sync', 'ihub-sync' ),
+		'ihub-sync',
+		'ihub-sync',
+		'course_ihub_eventbrite_sync'
+	);
 }
 add_action( 'admin_menu', 'course_menu' );
 
@@ -323,6 +331,104 @@ function course_elm_sync() {
      */
     $feed = file_get_contents('https://learn.bcpublicservice.gov.bc.ca/learningcentre/courses/feed.json');
     $courses = json_decode($feed);
+    echo '<h3>' . count($courses->items) . ' Courses.</h3>';
+    /**
+     * #TODO Note that course titles have a convention for courses which are restricted to certain groups:
+     * {RESTRICTED TO MinX and TEAMS}
+     * I think that it would good to parse these strings out into taxonomy terms, making it easier
+     * to look up courses for a given Ministry.
+     */
+    foreach($courses->items as $course) {
+
+        if(!empty($course->title)) {
+            $existing = post_exists($course->title);
+            if($existing) {
+                echo 'ID: ' . $existing . ' ' . $course->title . ' ALREADY EXISTS<br>';
+                $existingcourse = get_post($existing);
+                if($existingcourse->description != $course->summary) {
+                    $existingcourse->description = $course->summary;
+                }
+                $existingcourse->post_status = 'publish';
+                wp_update_post( $existingcourse );
+                echo $existingcourse->title . ' Updated<br>';
+            } else {
+                $new_course = array(
+                    'post_title' => $course->title,
+                    'post_type' => 'course',
+                    'post_status' => 'publish', 
+                    'post_content' => $course->summary,
+                    'post_excerpt' => substr($course->summary, 0, 100),
+                    'meta_input'   => array(
+                        'course_link' => $course->url,
+                        'elm_course_code' => $course->id
+                    )
+                );
+                $post_id = wp_insert_post( $new_course );
+                wp_set_object_terms( $post_id, 'PSA Learning System', 'learning_partner  ', false);
+                wp_set_object_terms( $post_id, $course->delivery_method, 'delivery_method', false);
+                $cats = explode(',', $course->tags);
+                foreach($cats as $cat) {
+                    wp_set_object_terms( $post_id, $cat, 'course_category', true);
+                }
+                echo $post_id . ' - ' . $course->title . ' Created<br>';
+            }
+
+            
+        }
+    }
+}
+
+/**
+ * Synchronize with the public feed for the Innovation Hub's
+ * Eventbrite RSS feed
+ */
+function course_ihub_eventbrite_sync() {
+
+	if ( !current_user_can( 'manage_options' ) )  {
+		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+	}
+    echo '<h1>Innovation Hub EventBrite Events</h1>';
+    echo '<p>Synchronize with the <a href="https://www.eventbrite.ca/o/innovation-hub-18067188179">';
+    echo 'Innovation Hub\'s EventBrite Event listing</a></p>';
+
+    /**
+     * First let's make every page private so that if the course is no longer in the catalog, 
+     * that it gets removed from the listing here. Note that we're just making these courses
+     * private, and NOT deleting them. We're going to loop through the source catalog after 
+     * this, and if the post already exists and nothing has changed, then we just make it 
+     * published again and move on. We could just delete them, and may change to that in 
+     * the future, depending on feedback.
+     * 
+     * The term_id for the "PSA Learning System" category in the "Learning Partner" taxonomy
+     * is 14; you may need to change this value if it changes as we move betwixt platforms.
+     * #TODO perhaps make this a slug-based query?
+     */
+    // $all_posts = get_posts(array(
+    //     'post_type' => 'course',
+    //     'numberposts' => -1,
+    //     'tax_query' => array(
+    //         array(
+    //         'taxonomy' => 'learning_partner',
+    //         'field' => 'term_id',
+    //         'terms' => 51)
+    //     ))
+    // );
+    // foreach ($all_posts as $single_post){
+    //     $single_post->post_status = 'private';
+    //     wp_update_post( $single_post );
+    // }
+    /**
+     * Now that all those courses are private, let's grab the public listing of courses from 
+     * EventBrite and loop through those, updating existing ones as required 
+     * and publishing new ones.
+     */
+    //$feed = file_get_contents('https://www.eventbrite.com/rss/organizer_list_events/18067188179');
+    //$courses = simplexml_load_string($feed);
+    //print_r($courses); 
+    echo 'Coming Soon.';
+    exit;
+    //$feed = file_get_contents('https://learn.bcpublicservice.gov.bc.ca/learningcentre/courses/feed.json');
+    //$courses = json_decode($feed);
     echo '<h3>' . count($courses->items) . ' Courses.</h3>';
     /**
      * #TODO Note that course titles have a convention for courses which are restricted to certain groups:
