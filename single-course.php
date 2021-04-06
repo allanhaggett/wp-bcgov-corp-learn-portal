@@ -22,7 +22,7 @@ while ( have_posts() ) :
 
 <header class="entry-header alignwide">
 
-	<div>Course</div>
+	<div><a href="/portal/course/">Course</a></div>
 
 	<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
 
@@ -42,7 +42,7 @@ while ( have_posts() ) :
 	?>
 
 	<div>
-	<a style="font-size: 2rem" 
+	<a style="background: #3a9bd9; color: #F2F2F2; display: block; font-size: 2rem; padding: .25em .5em; text-align: center" 
 		href="<?= $post->course_link ?>" 
 		target="_blank" 
 		rel="noopener">

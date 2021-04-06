@@ -364,7 +364,7 @@ function course_elm_sync() {
                     )
                 );
                 $post_id = wp_insert_post( $new_course );
-                wp_set_object_terms( $post_id, 'PSA Learning System', 'learning_partner  ', false);
+                wp_set_object_terms( $post_id, 'PSA Learning System', 'learning_partner', false);
                 wp_set_object_terms( $post_id, $course->delivery_method, 'delivery_method', false);
                 $cats = explode(',', $course->tags);
                 foreach($cats as $cat) {
