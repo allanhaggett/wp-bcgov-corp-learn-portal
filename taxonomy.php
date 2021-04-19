@@ -19,11 +19,13 @@ $parent = get_term($term->parent, get_query_var('taxonomy') ); // get parent ter
 <?php if ( have_posts() ) : ?>
 
 	<header class="page-header alignwide">
+	<?php if(!empty($parent->slug)): ?>
 	<div>
 		<a href="/portal/course_category/<?php echo $parent->slug ?>">
 			<?php echo $parent->name ?>
 		</a>
 	</div>
+	<?php endif ?>
 	<h1><?php echo $term->name ?></h1>
 		<?php //the_archive_title( '<h1 class="page-title">', '</h1>' ); ?>
 		<?php if ( $description ) : ?>
@@ -55,6 +57,7 @@ foreach($catlist as $childcat) {
 		<article style="background: #F2F2F2; border-radius: 3px; color: #333; margin: 1em 0; padding: 1em;">
 		<h3 style="margin-bottom: .5em;"><a style="color: #333;" href="<?php the_permalink() ?>"><?php the_title() ?></a></h3>
 		<?php the_content() ?>
+		<div class="delivermethlink"><?php the_terms( $post->ID, 'delivery_method', 'Delivery Method: ', ', ', ' ' ); ?></div>
 		<div style="margin: 1em 0;">
 		<a style="background: #3a9bd9; color: #F2F2F2; display: block; font-size: 2rem; padding: .25em .5em; text-align: center" 
 			href="<?= $post->course_link ?>" 

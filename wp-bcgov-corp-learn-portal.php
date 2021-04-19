@@ -8,31 +8,6 @@ Version: 1
 Author URI: https://learning.gww.gov.bc.ca
 */
 
-/**
- * This plugin enables a custom content type, and several custom taxonomies to along 
- * with it. We'll create a "course" type and associate taxonomies such as Roles, 
- * Programs, and Delivery Methods. We'll set Courses as a 'page' type, so that we can 
- * also leverage parent/child relationships if we want to.
- * We will also enable custom fields to capture information such as "how to register" 
- * on a item-by-item basis, and create custom meta boxes to better manage the UI
- * for admin folx.
- * We provide page templates for the type, both single view and main archives.
- * 
- * There is also system-specific synchronization methods, starting with the 
- * PSA Learning System (ELM).
- * - Make private all courses within the defined "Learning Partner" taxonomy. 
- * - Read a specific feed of courses from a Learning Partner
- * - Loop through each one:
- *     - Does the course already exist here? 
- *         - If yes, does anything need updating?
- *             - Update and publish
- *         - If no, simply publish
- *     - If no, create and publish
- * - **Note again that if the course exists in the system, but not the feed,
- *   then we retain the record of there once having been a course from that 
- *   source, but it is kept as "private" so it's removed from public view here. 
- * 
- */
 
 /**
  * Start by defining the course content type, then start tacking on our taxonomies
@@ -50,7 +25,7 @@ function my_custom_post_course() {
         'search_items'       => __( 'Search Courses' ),
         'not_found'          => __( 'No courses found' ),
         'not_found_in_trash' => __( 'No courses found in the Trash' ), 
-        'parent_item_colon'  => ’,
+        'parent_item_colon'  => __( 'Parent courses: ' ), 
         'menu_name'          => 'Courses'
     );
     $args = array(
@@ -159,30 +134,6 @@ function my_taxonomies_course_delivery_method() {
     register_taxonomy( 'delivery_method', 'course', $args );
 }
 
-/** 
- * Course best suited to a role
- */
-function my_taxonomies_course_role() {
-    $labels = array(
-        'name'              => _x( 'Roles', 'taxonomy general name' ),
-        'singular_name'     => _x( 'Role', 'taxonomy singular name' ),
-        'search_items'      => __( 'Search Roles' ),
-        'all_items'         => __( 'All Roles' ),
-        'parent_item'       => __( 'Parent Role' ),
-        'parent_item_colon' => __( 'Parent Role:' ),
-        'edit_item'         => __( 'Edit Role' ), 
-        'update_item'       => __( 'Update Role' ),
-        'add_new_item'      => __( 'Add New Role' ),
-        'new_item_name'     => __( 'New Role' ),
-        'menu_name'         => __( 'Roles' ),
-    );
-    $args = array(
-        'labels' => $labels,
-        'hierarchical' => false,
-        'show_in_rest' => true,
-    );
-    register_taxonomy( 'role', 'course', $args );
-}
 
 /** 
  * Course is a part of a larger program or initiative
@@ -215,9 +166,46 @@ function my_taxonomies_course_program() {
 
 add_action( 'init', 'my_taxonomies_course_category', 0 );
 add_action( 'init', 'my_taxonomies_course_delivery_method', 0 );
-add_action( 'init', 'my_taxonomies_course_role', 0 );
 add_action( 'init', 'my_taxonomies_course_program', 0 );
 add_action( 'init', 'my_taxonomies_learning_partner', 0 );
+
+
+
+// search all taxonomies, based on: http://projects.jesseheap.com/all-projects/wordpress-plugin-tag-search-in-wordpress-23
+
+function lzone_search_where($where){
+    global $wpdb;
+    if (is_search())
+      $where .= "OR (t.name LIKE '%".get_search_query()."%' AND {$wpdb->posts}.post_status = 'publish')";
+    return $where;
+  }
+  
+  function lzone_search_join($join){
+    global $wpdb;
+    if (is_search())
+      $join .= "LEFT JOIN {$wpdb->term_relationships} tr ON {$wpdb->posts}.ID = tr.object_id INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_taxonomy_id=tr.term_taxonomy_id INNER JOIN {$wpdb->terms} t ON t.term_id = tt.term_id";
+    return $join;
+  }
+  
+  function lzone_search_groupby($groupby){
+    global $wpdb;
+  
+    // we need to group on post ID
+    $groupby_id = "{$wpdb->posts}.ID";
+    if(!is_search() || strpos($groupby, $groupby_id) !== false) return $groupby;
+  
+    // groupby was empty, use ours
+    if(!strlen(trim($groupby))) return $groupby_id;
+  
+    // wasn't empty, append ours
+    return $groupby.", ".$groupby_id;
+  }
+  
+  add_filter('posts_where','lzone_search_where');
+  add_filter('posts_join', 'lzone_search_join');
+  add_filter('posts_groupby', 'lzone_search_groupby');
+
+
 
 /**
  * Now let's make sure that we're using our own customized template
