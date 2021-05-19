@@ -37,9 +37,7 @@ while ( have_posts() ) :
 	<div><?php the_terms( $post->ID, 'role', 'Roles: ', ', ', ' ' ); ?></div>
 	<div><?php the_terms( $post->ID, 'program', 'Programs: ', ', ', ' ' ); ?></div>
 
-	<?php
-	the_content();
-	?>
+	<?php the_content() ?>
 
 	<div>
 	<a style="background: #3a9bd9; color: #F2F2F2; display: block; font-size: 2rem; padding: .25em .5em; text-align: center" 

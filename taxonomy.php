@@ -54,19 +54,34 @@ foreach($catlist as $childcat) {
 <div class="alignwide">
 	<?php while ( have_posts() ) : ?>
 		<?php the_post(); ?>
-		<article style="background: #F2F2F2; border-radius: 3px; color: #333; margin: 1em 0; padding: 1em;">
-		<h3 style="margin-bottom: .5em;"><a style="color: #333;" href="<?php the_permalink() ?>"><?php the_title() ?></a></h3>
-		<?php the_content() ?>
-		<div class="delivermethlink"><?php the_terms( $post->ID, 'delivery_method', 'Delivery Method: ', ', ', ' ' ); ?></div>
-		<div style="margin: 1em 0;">
-		<a style="background: #3a9bd9; color: #F2F2F2; display: block; font-size: 2rem; padding: .25em .5em; text-align: center" 
-			href="<?= $post->course_link ?>" 
-			target="_blank" 
-			rel="noopener">
-				Register Here
-		</a>
-		</div>
-		</article>
+		<div class="course">
+                <div style="background: #3a9bd9; height: 6px; width: 25%;"></div> 
+                <div class="coursename">
+                <a  href="<?php echo get_permalink(); ?>">
+                    <?= the_title(); ?>
+                </a>
+                <!-- <a href="#course-<?= $post->ID ?>" class="showdeets">#</a> -->
+                </div>
+                <div class="details" id="course-<?= $post->ID ?>">
+                    <div class="learningpartner">
+                        <?php the_terms( $post->ID, 'learning_partner', 'Offered by: ', ', ', ' ' ); ?>
+                    </div>
+                    <div class="coursedesc">
+                        <?php the_content(); ?>
+                    </div>
+                    <div class="coursecats">
+                        <?php the_terms( $post->ID, 'course_category', 'Categories: ', ', ', ' ' ); ?>
+                    </div>
+                    <div class="courseregister">
+                    <a style="background: #3a9bd9; color: #F2F2F2; font-size: 1.2rem; padding: .5em 1em; text-align: center; text-decoration: none;" 
+                        href="<?= $post->course_link ?>" 
+                        target="_blank" 
+                        rel="noopener">
+                            Register Here +
+                    </a>
+                    </div>
+                </div>
+           </div> <!-- /.course -->
 	<?php endwhile; ?>
 </div>
 <div style="clear: both">
