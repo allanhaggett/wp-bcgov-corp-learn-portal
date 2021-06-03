@@ -20,7 +20,7 @@ while ( have_posts() ) :
 	?>
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 
-<header class="entry-header alignwide"><header class="entry-header alignfull" style="background: #FFF; padding: 2em 2em 3em 2em;">
+<header class="entry-header alignfull"><header class="entry-header alignfull" style="background: #FFF; padding: 2em 2em 3em 2em;">
 		<div class="alignwide">
 
 	<div><a href="/portal/course/">Course</a></div>
