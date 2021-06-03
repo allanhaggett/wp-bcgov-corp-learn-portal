@@ -242,6 +242,9 @@ function course_tax_template( $tax_template ) {
     if ( is_tax ( 'course_category' ) ) {
          $tax_template = dirname( __FILE__ ) . '/taxonomy.php';
     }
+    if ( is_tax ( 'learning_partner' ) ) {
+        $tax_template = dirname( __FILE__ ) . '/taxonomy-partner.php';
+   }
     return $tax_template;
 }
 
