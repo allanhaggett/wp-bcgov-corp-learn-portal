@@ -18,7 +18,8 @@ $parent = get_term($term->parent, get_query_var('taxonomy') ); // get parent ter
 
 <?php if ( have_posts() ) : ?>
 
-	<header class="page-header alignwide">
+	<header class="entry-header alignfull" style="background: #FFF; padding: 2em 2em 3em 2em;">
+		<div class="alignwide">
 	<?php if(!empty($parent->slug)): ?>
 	<div>
 		<a href="/portal/course_category/<?php echo $parent->slug ?>">
@@ -31,6 +32,7 @@ $parent = get_term($term->parent, get_query_var('taxonomy') ); // get parent ter
 		<?php if ( $description ) : ?>
 			<div class="archive-description"><?php echo wp_kses_post( wpautop( $description ) ); ?></div>
 		<?php endif; ?>
+		</div>
 	</header><!-- .page-header -->
 	<div class="alignwide">
 <?php 

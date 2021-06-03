@@ -20,19 +20,19 @@ $description = get_the_archive_description();
 	<!-- <div class="wp-block-media-text alignfull is-stacked-on-mobile is-vertically-aligned-top alignwide is-style-default has-dark-gray-color has-text-color has-background" > -->
         <!-- style="grid-template-columns:30% auto; margin-top: 1.5em;"> -->
         
-    <!-- <div class=""
+    <div class=""
         style="background-color:#fff; margin-top: 1.5em; padding: 1.5em;">
-    <ul> -->
+    <ul>
     <?php
-    //  wp_list_categories( array(
-	//  	'taxonomy' => 'course_category',
-    //     'orderby' => 'name',
-	// 	'title_li' => '',
-    //     'depth' => 1
-    // ) );
+     wp_list_categories( array(
+	 	'taxonomy' => 'course_category',
+        'orderby' => 'name',
+		'title_li' => '',
+        'depth' => 1
+    ) );
     ?>
-    <!-- </ul>
-    </div> -->
+    </ul>
+    </div>
 	<div class="">
     <div id="courselist">
     <div class="searchbox">
