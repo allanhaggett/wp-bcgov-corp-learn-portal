@@ -17,27 +17,52 @@ $description = get_the_archive_description();
     <div class="alignwide">
 
     
-	<!-- <div class="wp-block-media-text alignfull is-stacked-on-mobile is-vertically-aligned-top alignwide is-style-default has-dark-gray-color has-text-color has-background" > -->
-        <!-- style="grid-template-columns:30% auto; margin-top: 1.5em;"> -->
+
         
-    <div class=""
-        style="background-color:#fff; margin-top: 1.5em; padding: 1.5em;">
-    <ul>
-    <?php
-     wp_list_categories( array(
-	 	'taxonomy' => 'course_category',
-        'orderby' => 'name',
-		'title_li' => '',
-        'depth' => 1
-    ) );
-    ?>
-    </ul>
-    </div>
+
 	<div class="">
+    <?php
+    //  wp_list_categories( array(
+	//  	'taxonomy' => 'course_category',
+    //     'orderby' => 'name',
+	// 	'title_li' => '',
+    //     'depth' => 1
+    // ) );
+    $categories = get_terms( 
+        'course_category', 
+        array('parent' => 0)
+     );
+    ?>
+    <div class="" style="background: #FFF; border-radius: 3px; margin: 1em 0; padding: 1em;">
+    <div><span id="coursecount"></span> courses in 4 top-level categories:</div>
+    <style>
+        .coursecat { 
+            background: #3a9bd9; 
+            border-radius: 5px; 
+            color: #FFF; 
+            display: inline-block; 
+            padding: .25em .5em; 
+            text-decoration: none;
+        }
+    </style>
+    <?php 
+    foreach( $categories as $category ):
+        if($category->name == "Ministry") continue;
+        $category_link = sprintf( 
+            '<a href="%1$s" alt="%2$s" class="coursecat">%3$s</a>',
+            esc_url( get_category_link( $category->term_id ) ),
+            esc_attr( sprintf( __( 'View all posts in %s', 'textdomain' ), $category->name ) ),
+            esc_html( $category->name )
+        );
+        echo '' . sprintf( esc_html__( '%s', 'textdomain' ), $category_link ) . ' ';
+     
+    endforeach ?>
+</div>
+    
     <div id="courselist">
-    <div class="searchbox">
+    <div class="searchbox" style="box-shadow: 0 0 .5em #F1F1F1;">
     <input class="search form-control mb-3" placeholder="Search">
-    </div>
+
 	<?php
 $post_type = 'course'; //your post type name here
 $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
@@ -63,7 +88,17 @@ $post_my_query = new WP_Query($post_args);
 $lastletter = '';
 if( $post_my_query->have_posts() ) :
 ?>
-
+    <style>
+    .alphabet a {
+        background: #F1F1F1;
+        border-radius: 3px;
+        display: inline-block;
+        font-size: .6em;
+        margin: 0 .15em;
+        padding: .25em .5em;
+        text-decoration: none;
+    }
+    </style>
     <div class="alphabet">
         <a href="#A">A</a>
         <a href="#B">B</a>
@@ -92,7 +127,10 @@ if( $post_my_query->have_posts() ) :
         <a href="#Y">Y</a>
         <a href="#Z">Z</a>
     </div> <!-- /.alphabet -->
-    <div><span id="coursecount"></span> Courses</div>
+    
+    </div>
+    
+    
     <div class="list">
         <?php
             while ($post_my_query->have_posts()) : $post_my_query->the_post(); 

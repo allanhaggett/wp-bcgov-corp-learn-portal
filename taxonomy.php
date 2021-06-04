@@ -20,21 +20,25 @@ $parent = get_term($term->parent, get_query_var('taxonomy') ); // get parent ter
 
 	<header class="entry-header alignfull" style="background: #FFF; padding: 2em 2em 3em 2em;">
 		<div class="alignwide">
-	<?php if(!empty($parent->slug)): ?>
+	
 	<div>
+		<a href="/portal/course/">
+			All Courses
+		</a> 
+		<?php if(!empty($parent->slug)): ?>
+		/ 
 		<a href="/portal/course_category/<?php echo $parent->slug ?>">
 			<?php echo $parent->name ?>
 		</a>
+		<?php endif ?>
 	</div>
-	<?php endif ?>
+	
 	<h1><?php echo $term->name ?></h1>
 		<?php //the_archive_title( '<h1 class="page-title">', '</h1>' ); ?>
 		<?php if ( $description ) : ?>
 			<div class="archive-description"><?php echo wp_kses_post( wpautop( $description ) ); ?></div>
 		<?php endif; ?>
-		</div>
-	</header><!-- .page-header -->
-	<div class="alignwide">
+<div class="" style="margin: 1em 0 0 0;">
 <?php 
 // Get a list of all sub-categories and output them as simple links
 $catlist = get_categories(
@@ -53,6 +57,9 @@ foreach($catlist as $childcat) {
 //print_r($catlist);
 ?>
 </div>
+</div>
+</div>
+	</header><!-- .page-header -->
 <div class="alignwide">
 	<?php while ( have_posts() ) : ?>
 		<?php the_post(); ?>

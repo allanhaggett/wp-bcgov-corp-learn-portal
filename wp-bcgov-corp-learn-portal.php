@@ -136,28 +136,28 @@ function my_taxonomies_course_delivery_method() {
 
 
 /** 
- * Course is a part of a larger program or initiative
+ * Course keywords for more targeted searches
  */
-function my_taxonomies_course_program() {
+function my_taxonomies_course_keywords() {
     $labels = array(
-        'name'              => _x( 'Programs', 'taxonomy general name' ),
-        'singular_name'     => _x( 'Program', 'taxonomy singular name' ),
-        'search_items'      => __( 'Search Programs' ),
-        'all_items'         => __( 'All Programs' ),
-        'parent_item'       => __( 'Parent Program' ),
-        'parent_item_colon' => __( 'Parent Program:' ),
-        'edit_item'         => __( 'Edit Program' ), 
-        'update_item'       => __( 'Update Program' ),
-        'add_new_item'      => __( 'Add New Program' ),
-        'new_item_name'     => __( 'New Program' ),
-        'menu_name'         => __( 'Programs' ),
+        'name'              => _x( 'Keywords', 'taxonomy general name' ),
+        'singular_name'     => _x( 'Keyword', 'taxonomy singular name' ),
+        'search_items'      => __( 'Search Keywords' ),
+        'all_items'         => __( 'All Keywords' ),
+        'parent_item'       => __( 'Parent Keyword' ),
+        'parent_item_colon' => __( 'Parent Keyword:' ),
+        'edit_item'         => __( 'Edit Keyword' ), 
+        'update_item'       => __( 'Update Keyword' ),
+        'add_new_item'      => __( 'Add New Keyword' ),
+        'new_item_name'     => __( 'New Keyword' ),
+        'menu_name'         => __( 'Keywords' ),
     );
     $args = array(
         'labels' => $labels,
         'hierarchical' => false,
         'show_in_rest' => true,
     );
-    register_taxonomy( 'program', 'course', $args );
+    register_taxonomy( 'keywords', 'course', $args );
 }
 
 /** 
@@ -166,7 +166,7 @@ function my_taxonomies_course_program() {
 
 add_action( 'init', 'my_taxonomies_course_category', 0 );
 add_action( 'init', 'my_taxonomies_course_delivery_method', 0 );
-add_action( 'init', 'my_taxonomies_course_program', 0 );
+add_action( 'init', 'my_taxonomies_course_keywords', 0 );
 add_action( 'init', 'my_taxonomies_learning_partner', 0 );
 
 
