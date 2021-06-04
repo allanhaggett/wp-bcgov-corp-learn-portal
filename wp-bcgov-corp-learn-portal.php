@@ -329,19 +329,30 @@ function course_elm_sync() {
      * I think that it would good to parse these strings out into taxonomy terms, making it easier
      * to look up courses for a given Ministry.
      */
+    $existingcourses = [];
+    $newcourses = [];
     foreach($courses->items as $course) {
 
         if(!empty($course->title)) {
             $existing = post_exists($course->title);
             if($existing) {
-                echo 'ID: ' . $existing . ' ' . $course->title . ' ALREADY EXISTS<br>';
+                // Get existing course details
                 $existingcourse = get_post($existing);
+                // Check the basics to see if details match; if they don't
+                // then update them wile incrementing the $updated variable
+                // so that we can show which courses have been updated
+                // in the UI
                 if($existingcourse->description != $course->summary) {
                     $existingcourse->description = $course->summary;
+                    $updated = 1;
                 }
+                // Set to publish
                 $existingcourse->post_status = 'publish';
                 wp_update_post( $existingcourse );
-                echo $existingcourse->title . ' Updated<br>';
+                // We loop through $existingcourses below
+                if($updated > 0) {
+                    array_push($existingcourses,$existingcourse);
+                }
             } else {
                 $new_course = array(
                     'post_title' => $course->title,
@@ -361,12 +372,20 @@ function course_elm_sync() {
                 foreach($cats as $cat) {
                     wp_set_object_terms( $post_id, $cat, 'course_category', true);
                 }
-                echo $post_id . ' - ' . $course->title . ' Created<br>';
+                array_push($newcourses,$post_id);
             }
-
-            
         }
     }
+    echo '<h1>New Courses</h1>';
+    foreach($newcourses as $nc) {
+        echo $nc->title . ' added<br>';
+    }
+    echo '<hr>';
+    echo '<h1>Updated Courses</h1>';
+    foreach($existingcourses as $ex) {
+        echo $ex->post_title . ' updated<br>';
+    }
+
 }
 
 /**
