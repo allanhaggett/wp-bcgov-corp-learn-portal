@@ -12,13 +12,33 @@
 get_header();
 
 $description = get_the_archive_description();
+
+$post_type = 'course'; //your post type name here
+$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+$post_args=array(
+    'post_type'                => $post_type,
+    'post_status'              => 'publish',
+    'posts_per_page'           => 300,
+    'paged'                    => $paged, 
+    'ignore_sticky_posts'      => 0,
+    'child_of'                 => 0,
+    'parent'                   => 0,
+    'orderby'                  => 'name', 
+    'order'                    => 'ASC',
+    'hide_empty'               => 0,
+    'hierarchical'             => 1,
+    'exclude'                  => '',
+    'include'                  => '',
+    'number'                   => '',
+    'pad_counts'               => true, 
+);
+$post_my_query = null;
+$post_my_query = new WP_Query($post_args);
+$lastletter = '';
+
 ?>
 
     <div class="alignwide">
-
-    
-
-        
 
 	<div class="">
     <?php
@@ -33,8 +53,12 @@ $description = get_the_archive_description();
         array('parent' => 0)
      );
     ?>
-    <div class="" style="background: #FFF; border-radius: 3px; margin: 1em 0; padding: 1em;">
-    <div><span id="coursecount"></span> courses in 4 top-level categories:</div>
+    <div style="background: #FFF; border-radius: 3px; margin: 1em 0; padding: 1em;">
+    <div>
+        <?php echo $post_my_query->post_count; ?> 
+        courses in 3 top-level categories from 10 
+        <a href="/portal/corporate-learning-partners/">Learning Partners</a>
+    </div>
     <style>
         .coursecat { 
             background: #3a9bd9; 
@@ -57,37 +81,16 @@ $description = get_the_archive_description();
         echo '' . sprintf( esc_html__( '%s', 'textdomain' ), $category_link ) . ' ';
      
     endforeach ?>
-</div>
+    </div>
     
     <div id="courselist">
-    <div class="searchbox" style="box-shadow: 0 0 .5em #F1F1F1;">
+    <div class="searchbox">
     <input class="search form-control mb-3" placeholder="Search">
+    <!-- <div><span id="coursecount"></span> courses</div> -->
 
-	<?php
-$post_type = 'course'; //your post type name here
-$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
-$post_args=array(
-    'post_type'                => $post_type,
-    'post_status'              => 'publish',
-    'posts_per_page'           => 300,
-    'paged'                    => $paged, 
-    'ignore_sticky_posts'      => 0,
-    'child_of'                 => 0,
-    'parent'                   => 0,
-    'orderby'                  => 'name', 
-    'order'                    => 'ASC',
-    'hide_empty'               => 0,
-    'hierarchical'             => 1,
-    'exclude'                  => '',
-    'include'                  => '',
-    'number'                   => '',
-    'pad_counts'               => false, 
-);
-$post_my_query = null;
-$post_my_query = new WP_Query($post_args);
-$lastletter = '';
-if( $post_my_query->have_posts() ) :
-?>
+    <?php if( $post_my_query->have_posts() ) : ?>
+
+   </div>
     <style>
     .alphabet a {
         background: #F1F1F1;
@@ -128,7 +131,7 @@ if( $post_my_query->have_posts() ) :
         <a href="#Z">Z</a>
     </div> <!-- /.alphabet -->
     
-    </div>
+ 
     
     
     <div class="list">
@@ -166,6 +169,9 @@ if( $post_my_query->have_posts() ) :
                     <div class="coursecats">
                         <?php the_terms( $post->ID, 'course_category', 'Categories: ', ', ', ' ' ); ?>
                     </div>
+                    <div class="coursekeys" style="display:none">
+                        <?php the_terms( $post->ID, 'keywords', 'Keywords: ', ', ', ' ' ); ?>
+                    </div>
                     <div class="courseregister">
                     <a style="background: #3a9bd9; color: #F2F2F2; font-size: 1.2rem; padding: .5em 1em; text-align: center; text-decoration: none;" 
                         href="<?= $post->course_link ?>" 
@@ -199,7 +205,7 @@ wp_reset_query($post_my_query);
 <script>
 
 var courseoptions = {
-    valueNames: [ 'coursename', 'coursedesc', 'coursecats' ]
+    valueNames: [ 'coursename', 'coursedesc', 'coursecats', 'coursekeys' ]
 };
 var courses = new List('courselist', courseoptions);
 document.getElementById('coursecount').innerHTML = courses.update().matchingItems.length;
