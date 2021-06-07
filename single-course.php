@@ -23,7 +23,7 @@ while ( have_posts() ) :
 <header class="entry-header alignfull"><header class="entry-header alignfull" style="background: #FFF; padding: 2em 2em 3em 2em;">
 		<div class="alignwide">
 
-	<div><a href="/portal/course/">Course</a></div>
+	<div><a href="/portal/course/">All Courses</a></div>
 
 	<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
 </div>
@@ -54,7 +54,7 @@ while ( have_posts() ) :
 
 <footer class="entry-footer default-max-width">
 
-	<?php the_meta() ?>
+	<?php //the_meta() ?>
 	
 </footer><!-- .entry-footer -->
 
