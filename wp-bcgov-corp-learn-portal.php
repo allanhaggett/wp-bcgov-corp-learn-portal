@@ -344,15 +344,27 @@ function course_elm_sync() {
                 // in the UI
                 if($existingcourse->description != $course->summary) {
                     $existingcourse->description = $course->summary;
+                    // set updated to 1 so that we know to add this course to 
+                    // the updated courses list that we will show in the UI
                     $updated = 1;
                 }
-                // Set to publish
+                // #TODO #FIXME check all the fields for changes here
+                // ...
+                // ...
+                
+
+                // Even if there aren't any changes, if the course exists in
+                // the feed then we need to set this back to publish. In this
+                // way, if the course no longer exists in the feed, it won't
+                // get changed back and will remain private
                 $existingcourse->post_status = 'publish';
                 wp_update_post( $existingcourse );
                 // We loop through $existingcourses below
                 if($updated > 0) {
                     array_push($existingcourses,$existingcourse);
                 }
+                // set back to 0 so it doesn't trigger on the next loop
+                $updated = 0;
             } else {
                 $new_course = array(
                     'post_title' => $course->title,
@@ -371,6 +383,10 @@ function course_elm_sync() {
                 $cats = explode(',', $course->tags);
                 foreach($cats as $cat) {
                     wp_set_object_terms( $post_id, $cat, 'course_category', true);
+                }
+                $keywords = explode(',', $course->_keywords);
+                foreach($keywords as $key) {
+                    wp_set_object_terms( $post_id, $key, 'keywords', true);
                 }
                 array_push($newcourses,$post_id);
             }
