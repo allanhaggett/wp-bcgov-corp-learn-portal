@@ -344,7 +344,24 @@ function course_elm_sync() {
                 // #TODO #FIXME check all the fields for changes here
                 // ...
                 // ...
-                
+                // #FIXME this is purely additive and not *remove* any 
+                // categories; find a way to strip all cats first
+                // perhaps at the top when we set everything to private
+                $cats = explode(',', $course->tags);
+                foreach($cats as $cat) {
+                    wp_set_object_terms( $existingcourse->ID, $cat, 'course_category', true);
+                }
+                // For the keywords, we're just going to run through and
+                // add them all in whether they exist already or not; if
+                // this becomes problematic, add in the necessary processing
+                // so that we only add new tags. 
+                // #FIXME this is purely additive and not *remove* any keywords
+                // find a way to strip all keywords first
+                // perhaps at the top when we set everything to private
+                $keywords = explode(',', $course->_keywords);
+                foreach($keywords as $key) {
+                    wp_set_object_terms( $existingcourse->ID, $key, 'keywords', true);
+                }
 
                 // Even if there aren't any changes, if the course exists in
                 // the feed then we need to set this back to publish. In this
@@ -387,7 +404,7 @@ function course_elm_sync() {
     }
     echo '<h1>New Courses</h1>';
     foreach($newcourses as $nc) {
-        echo $nc->title . ' added<br>';
+        echo $nc->post_title . ' added<br>';
     }
     echo '<hr>';
     echo '<h1>Updated Courses</h1>';
