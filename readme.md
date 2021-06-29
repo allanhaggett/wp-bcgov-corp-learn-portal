@@ -1,12 +1,12 @@
 
-# BC Gov Corporate Learning Portal
+# BC Gov Corporate Learning Hub
 Description: A gateway to everything that BC Gov has to offer for learning opportunities.
-Author: Allan Haggett <allan.haggett@gov.bc.ca>
-Version: 1
 
-This plugin enables a custom content type, and several custom taxonomies to along 
-with it. We'll create a "course" type and associate taxonomies such as Roles, 
-Programs, and Delivery Methods. 
+## [Check out the Learning Hub](https://learninghub.gww.gov.bc.ca) (**BC Gov ID required**)
+
+This plugin enables a custom content type, and several custom taxonomies to go along 
+with it. We'll create a "course" type and associate taxonomies such as Categories,
+Delivery Methods, and keywords. 
 
 We'll set Courses as a 'page' type, so that we can also leverage parent/child 
 relationships if we want to.
