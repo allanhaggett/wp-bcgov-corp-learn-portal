@@ -5,7 +5,7 @@ Plugin URI: https://github.com/allanhaggett/wp-bcgov-corp-learn-portal
 Description: A gateway to everything that BC Gov has to offer for learning opportunities.
 Author: Allan Haggett <allan.haggett@gov.bc.ca>
 Version: 1
-Author URI: https://learning.gww.gov.bc.ca
+Author URI: https://learninghub.gww.gov.bc.ca
 */
 
 
