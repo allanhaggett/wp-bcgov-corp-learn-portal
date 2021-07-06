@@ -79,6 +79,7 @@ function my_taxonomies_learning_partner() {
     $args = array(
         'labels' => $labels,
         'hierarchical' => false,
+        'show_admin_column' => true,
         'show_in_rest' => true,
     );
     register_taxonomy( 'learning_partner', 'course', $args );
@@ -312,8 +313,10 @@ function course_elm_sync() {
      * Now that all those courses are private, let's grab the public listing of courses from 
      * the PSA Learning System and loop through those, updating existing ones as required 
      * and publishing new ones.
+     * Old feed:
+     * https://learn.bcpublicservice.gov.bc.ca/learningcentre/courses/feed.json
      */
-    $feed = file_get_contents('https://learn.bcpublicservice.gov.bc.ca/learningcentre/courses/feed.json');
+    $feed = file_get_contents('https://learn.bcpublicservice.gov.bc.ca/learning-hub/learning-partner-courses.json');
     $courses = json_decode($feed);
     echo '<h3>' . count($courses->items) . ' Courses.</h3>';
     /**
@@ -376,6 +379,7 @@ function course_elm_sync() {
                 // set back to 0 so it doesn't trigger on the next loop
                 $updated = 0;
             } else {
+                // set up the new course with basic settings in place
                 $new_course = array(
                     'post_title' => $course->title,
                     'post_type' => 'course',
@@ -387,26 +391,32 @@ function course_elm_sync() {
                         'elm_course_code' => $course->id
                     )
                 );
+                // Actually create the new post so that we can move on 
+                // to updating it with taxonomy etc
                 $post_id = wp_insert_post( $new_course );
-                wp_set_object_terms( $post_id, 'PSA Learning System', 'learning_partner', false);
+
                 wp_set_object_terms( $post_id, $course->delivery_method, 'delivery_method', false);
-                $cats = explode(',', $course->tags);
-                foreach($cats as $cat) {
-                    wp_set_object_terms( $post_id, $cat, 'course_category', true);
+                wp_set_object_terms( $post_id, $course->_learning_partner, 'learning_partner', false);
+
+                if(!empty($course->_keywords)) {
+                    $keywords = explode(',', $course->_keywords);
+                    foreach($keywords as $key) {
+                        wp_set_object_terms( $post_id, $key, 'keywords', true);
+                    }
                 }
-                $keywords = explode(',', $course->_keywords);
-                foreach($keywords as $key) {
-                    wp_set_object_terms( $post_id, $key, 'keywords', true);
+                if(!empty($course->tags)) {
+                    $cats = explode(',', $course->tags);
+                    foreach($cats as $cat) {
+                        wp_set_object_terms( $post_id, $cat, 'course_category', true);
+                    }
                 }
+
                 array_push($newcourses,$post_id);
             }
         }
     }
-    echo '<h1>New Courses</h1>';
-    foreach($newcourses as $nc) {
-        echo $nc->post_title . ' added<br>';
-    }
-    echo '<hr>';
+    
+
     echo '<h1>Updated Courses</h1>';
     foreach($existingcourses as $ex) {
         echo $ex->post_title . ' updated<br>';
