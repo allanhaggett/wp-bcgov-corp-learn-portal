@@ -44,6 +44,7 @@ function my_custom_post_course() {
         'can_export'          => true,
         'show_in_menu'        => true,
         'menu_position'       => 5,
+        'menu_icon'          => 'dashicons-book',
         'supports'            => array( 'title', 'editor', 'thumbnail' ),
         // , 'custom-fields'        
     );
