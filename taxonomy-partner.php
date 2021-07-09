@@ -31,7 +31,7 @@ $parent = get_term($term->parent, get_query_var('taxonomy') ); // get parent ter
 	<h1><?php echo $term->name ?></h1>
 		<?php //the_archive_title( '<h1 class="page-title">', '</h1>' ); ?>
 		<?php if ( $description ) : ?>
-			<div class="archive-description"><?php echo wp_kses_post( wpautop( $description ) ); ?></div>
+			<div class=""><?php echo wp_kses_post( wpautop( $description ) ); ?></div>
 		<?php endif; ?>
 		</div>
 	</header><!-- .page-header -->

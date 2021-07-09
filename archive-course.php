@@ -59,16 +59,7 @@ $lastletter = '';
         courses in 3 top-level categories from 10 
         <a href="/portal/corporate-learning-partners/">Learning Partners</a>
     </div>
-    <style>
-        .coursecat { 
-            background: #3a9bd9; 
-            border-radius: 5px; 
-            color: #FFF; 
-            display: inline-block; 
-            padding: .25em .5em; 
-            text-decoration: none;
-        }
-    </style>
+
     <?php 
     foreach( $categories as $category ):
         if($category->name == "Ministry") continue;
@@ -152,7 +143,7 @@ $lastletter = '';
             ?>
             
             <div class="course">
-                <div style="background: #3a9bd9; height: 6px; width: 25%;"></div> 
+                <div style="background: #28537d; height: 6px; width: 100%;"></div> 
                 <div class="coursename">
                 <a  href="<?php echo get_permalink(); ?>">
                     <?= the_title(); ?>
@@ -173,7 +164,7 @@ $lastletter = '';
                         <?php the_terms( $post->ID, 'keywords', 'Keywords: ', ', ', ' ' ); ?>
                     </div>
                     <div class="courseregister">
-                    <a style="background: #3a9bd9; color: #F2F2F2; font-size: 1.2rem; padding: .5em 1em; text-align: center; text-decoration: none;" 
+                    <a style="background: #28537d; color: #F2F2F2; font-size: 1.2rem; padding: .5em 1em; text-align: center; text-decoration: none;" 
                         href="<?= $post->course_link ?>" 
                         target="_blank" 
                         rel="noopener">

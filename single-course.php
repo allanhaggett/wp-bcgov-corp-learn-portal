@@ -19,8 +19,8 @@ while ( have_posts() ) :
 
 	?>
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-
-<header class="entry-header alignfull"><header class="entry-header alignfull" style="background: #FFF; padding: 2em 2em 3em 2em;">
+<div class="dark-wrap">
+<header class="entry-header alignfull"><header class="entry-header alignfull">
 		<div class="alignwide">
 
 	<div><a href="/portal/course/">All Courses</a></div>
@@ -29,7 +29,7 @@ while ( have_posts() ) :
 </div>
 
 </header>
-
+</div>
 <div class="entry-content">
 
 	<div><?php the_terms( $post->ID, 'learning_partner', 'Learning Partner: ', ', ', ' ' ); ?></div>

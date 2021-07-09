@@ -59,6 +59,34 @@ add_action( 'init', 'my_custom_post_course' );
  */
 
 /**
+ * Courses can synchronize from multiple different Systems; 
+ * e.g. PSA Learning System We use this taxonomy to keep things fresh with that system, 
+ * so we can update/add/remove courses within each system separately.
+ */
+function my_taxonomies_system() {
+    $labels = array(
+        'name'              => _x( 'Systems', 'taxonomy general name' ),
+        'singular_name'     => _x( 'System', 'taxonomy singular name' ),
+        'search_items'      => __( 'Search Systems' ),
+        'all_items'         => __( 'All Systems' ),
+        'parent_item'       => __( 'Parent System' ),
+        'parent_item_colon' => __( 'Parent System:' ),
+        'edit_item'         => __( 'Edit System' ), 
+        'update_item'       => __( 'Update System' ),
+        'add_new_item'      => __( 'Add New System' ),
+        'new_item_name'     => __( 'New System' ),
+        'menu_name'         => __( 'External Systems' ),
+    );
+    $args = array(
+        'labels' => $labels,
+        'hierarchical' => false,
+        'show_admin_column' => true,
+        'show_in_rest' => true,
+    );
+    register_taxonomy( 'external_system', 'course', $args );
+}
+
+ /**
  * Learning Partner. Courses can synchronize from multiple different Learning Partners; 
  * e.g. PSA Learning System We use this taxonomy to keep things fresh with that system, 
  * so we can update/add/remove courses within each system separately.
@@ -170,6 +198,7 @@ add_action( 'init', 'my_taxonomies_course_category', 0 );
 add_action( 'init', 'my_taxonomies_course_delivery_method', 0 );
 add_action( 'init', 'my_taxonomies_course_keywords', 0 );
 add_action( 'init', 'my_taxonomies_learning_partner', 0 );
+add_action( 'init', 'my_taxonomies_system', 0 );
 
 
 
@@ -301,9 +330,9 @@ function course_elm_sync() {
         'numberposts' => -1,
         'tax_query' => array(
             array(
-            'taxonomy' => 'learning_partner',
+            'taxonomy' => 'external_systems',
             'field' => 'term_id',
-            'terms' => 50)
+            'terms' => 1)
         ))
     );
     foreach ($all_posts as $single_post){
@@ -398,6 +427,7 @@ function course_elm_sync() {
 
                 wp_set_object_terms( $post_id, $course->delivery_method, 'delivery_method', false);
                 wp_set_object_terms( $post_id, $course->_learning_partner, 'learning_partner', false);
+                wp_set_object_terms( $post_id, 'PSA Learning System', 'external_system', false);
 
                 if(!empty($course->_keywords)) {
                     $keywords = explode(',', $course->_keywords);
