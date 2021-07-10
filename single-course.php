@@ -18,18 +18,17 @@ while ( have_posts() ) :
 	the_post();
 
 	?>
-<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+
+
 <div class="dark-wrap">
-<header class="entry-header alignfull"><header class="entry-header alignfull">
-		<div class="alignwide">
+<div class="alignwide" id="coursetop">
 
-	<div><a href="/portal/course/">All Courses</a></div>
+	<div class="allcourseslink"><a href="/portal/course/">All Courses</a></div>
+	<?php the_title( '<h1 class="coursehead">', '</h1>' ); ?>
 
-	<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
+</div>
 </div>
 
-</header>
-</div>
 <div class="entry-content">
 
 	<div><?php the_terms( $post->ID, 'learning_partner', 'Learning Partner: ', ', ', ' ' ); ?></div>
@@ -52,18 +51,6 @@ while ( have_posts() ) :
 
 </div><!-- .entry-content -->
 
-<footer class="entry-footer default-max-width">
-
-	<?php //the_meta() ?>
-	
-</footer><!-- .entry-footer -->
-
-
-</article><!-- #post-<?php the_ID(); ?> -->
-
-	<?php
-
-
-endwhile; // End of the loop.
+<?php endwhile; // End of the loop.
 
 get_footer();
