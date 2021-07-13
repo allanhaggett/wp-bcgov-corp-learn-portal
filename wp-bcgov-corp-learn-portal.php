@@ -107,7 +107,7 @@ function my_taxonomies_learning_partner() {
     );
     $args = array(
         'labels' => $labels,
-        'hierarchical' => false,
+        'hierarchical' => true,
         'show_admin_column' => true,
         'show_in_rest' => true,
     );
@@ -557,3 +557,98 @@ function course_save_course_link_meta ( $post_id, $post ) {
         delete_post_meta( $post_id, $meta_key, $meta_value );
     }
 }
+
+
+
+
+
+
+
+
+
+/**
+ * Register columns for our taxonomy
+ */
+function learning_partner_register_category_columns( $columns ) {
+    $columns['partner-url'] = __( 'Partner URL', 'generatewp' );
+    return $columns;
+}
+add_filter( 'manage_edit-learning_partner_columns', 'learning_partner_register_category_columns' );
+
+/**
+ * Retrieve value for our custom column
+ * 
+ * @param string $string      Blank string.
+ * @param string $column_name Name of the column.
+ * @param int    $term_id     Term ID.
+ */
+function learning_partner_category_column_display( $string = '', $column_name, $term_id ) {
+    return esc_html( get_term_meta( $term_id, $column_name, true ) ); // XSS ok.
+}
+add_filter( 'learning_partner_custom_column', 'learning_partner_category_column_display', 10, 3 );
+
+
+/**
+ * Display markup or template for custom field
+ */
+function learning_hub_quick_edit_category_field( $column_name, $screen ) {
+    // If we're not iterating over our custom column, then skip
+    if ( $screen != 'learning_partner' && $column_name != 'partner-url') {
+        return false;
+    }
+    ?>
+    <fieldset>
+        <div id="learning-hub-partner-url" class="inline-edit-col">
+            <label>
+                <span class="title"><?php _e( 'Partner URL', 'generatewp' ); ?></span>
+                <span class="input-text-wrap">
+                    <input type="text" name="<?php echo esc_attr( $column_name ); ?>" class="ptitle" value="">
+                </span>
+            </label>
+        </div>
+    </fieldset>
+    <?php
+}
+add_action( 'quick_edit_custom_box', 'learning_hub_quick_edit_category_field', 10, 2 );
+
+/**
+ * Callback runs when category is updated
+ * Will save user-provided input into the wp_termmeta DB table
+ */
+function learning_partner_quick_edit_save_category_field( $term_id ) {
+    if ( isset( $_POST['partner-url'] ) ) {
+        // security tip: kses
+        update_term_meta( $term_id, 'partner-url', $_POST['partner-url'] );
+    }
+}
+add_action( 'edited_learning_partner', 'learning_partner_quick_edit_save_category_field' );
+
+/**
+ * Front-end stuff for pulling in user-input values dynamically
+ * into our input field.
+ */
+function learning_partner_quickedit_category_javascript() {
+    $current_screen = get_current_screen();
+
+    if ( $current_screen->id != 'edit-learning_partner' || $current_screen->taxonomy != 'learning_partner' ) {
+        return;
+    }
+
+    // Ensure jQuery library is loaded
+    wp_enqueue_script( 'jquery' );
+    ?>
+    <script type="text/javascript">
+        /*global jQuery*/
+        jQuery(function($) {
+            $('#the-list').on( 'click', 'a.editinline', function( e ) {
+    			e.preventDefault();
+    			var $tr = $(this).closest('tr');
+    			var val = $tr.find('td.partner-url').text();
+    			// Update field
+    			$('tr.inline-edit-row :input[name="partner-url"]').val(val ? val : '');
+    		});
+        });
+    </script>
+    <?php
+}
+add_action( 'admin_print_footer_scripts-edit-tags.php', 'learning_partner_quickedit_category_javascript' );
