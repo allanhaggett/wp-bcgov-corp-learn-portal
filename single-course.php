@@ -22,10 +22,11 @@ while ( have_posts() ) :
 
 <div class="dark-wrap">
 <div class="alignwide" id="coursetop">
-
+<div class="entry-content">
 	<div class="allcourseslink"><a href="/portal/course/">All Courses</a></div>
 	<?php the_title( '<h1 class="coursehead">', '</h1>' ); ?>
 
+</div>
 </div>
 </div>
 

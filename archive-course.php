@@ -93,7 +93,7 @@ $lastletter = '';
         text-decoration: none;
     }
     </style>
-    <div class="alphabet">
+    <div class="alphabet" style="text-align: center;">
         <a href="#A">A</a>
         <a href="#B">B</a>
         <a href="#C">C</a>
@@ -124,7 +124,7 @@ $lastletter = '';
     
  
     
-    
+    <div class="entry-content">
     <div class="list">
         <?php
             while ($post_my_query->have_posts()) : $post_my_query->the_post(); 
@@ -179,6 +179,7 @@ $lastletter = '';
 
            endwhile;
        ?>
+    </div>
     </div>
     </div>
 <?php

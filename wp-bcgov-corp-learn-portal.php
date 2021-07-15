@@ -588,6 +588,11 @@ function learning_partner_category_column_display( $string = '', $column_name, $
 add_filter( 'learning_partner_custom_column', 'learning_partner_category_column_display', 10, 3 );
 
 
+
+
+
+
+
 /**
  * Display markup or template for custom field
  */
@@ -652,3 +657,45 @@ function learning_partner_quickedit_category_javascript() {
     <?php
 }
 add_action( 'admin_print_footer_scripts-edit-tags.php', 'learning_partner_quickedit_category_javascript' );
+
+
+add_action('learning_partner_edit_form_fields','learning_partner_edit_form_fields');
+add_action('learning_partner_edit_form', 'learning_partner_edit_form');
+add_action('learning_partner_add_form_fields','learning_partner_edit_form_fields');
+add_action('learning_partner_add_form','learning_partner_edit_form');
+
+
+function learning_partner_edit_form() {
+?>
+<script type="text/javascript">
+jQuery(document).ready(function(){
+jQuery('#edittag').attr( "enctype", "multipart/form-data" ).attr( "encoding", "multipart/form-data" );
+        });
+</script>
+<?php 
+}
+
+function learning_partner_edit_form_fields () {
+?>
+    <tr class="form-field">
+            <th valign="top" scope="row">
+                <label for="partner-url"><?php _e('Partner URL', ''); ?></label>
+            </th>
+            <td>
+                <input type="text" id="partner-url" name="partner-url">
+            </td>
+        </tr>
+        <?php 
+    }
+    
+    /**
+ * Callback runs when category is updated
+ * Will save user-provided input into the wp_termmeta DB table
+ */
+function learning_partner_save_category_field( $term_id ) {
+    if ( isset( $_POST['partner-url'] ) ) {
+        // security tip: kses
+        update_term_meta( $term_id, 'partner-url', $_POST['partner-url'] );
+    }
+}
+add_action( 'edited_learning_partner', 'learning_partner_save_category_field' );

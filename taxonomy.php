@@ -61,10 +61,11 @@ foreach($catlist as $childcat) {
 </div>
 	</header><!-- .page-header -->
 <div class="alignwide">
+<div class="entry-content">
 	<?php while ( have_posts() ) : ?>
 		<?php the_post(); ?>
 		<div class="course">
-                <div style="background: #3a9bd9; height: 6px; width: 25%;"></div> 
+                <div style="background: #28537d; height: 6px; margin-top: 1em; width: 100%;"></div> 
                 <div class="coursename">
                 <a  href="<?php echo get_permalink(); ?>">
                     <?= the_title(); ?>
@@ -82,7 +83,7 @@ foreach($catlist as $childcat) {
                         <?php the_terms( $post->ID, 'course_category', 'Categories: ', ', ', ' ' ); ?>
                     </div>
                     <div class="courseregister">
-                    <a style="background: #3a9bd9; color: #F2F2F2; font-size: 1.2rem; padding: .5em 1em; text-align: center; text-decoration: none;" 
+                    <a style="background: #28537d; color: #F2F2F2; font-size: 1.2rem; padding: .5em 1em; text-align: center; text-decoration: none;" 
                         href="<?= $post->course_link ?>" 
                         target="_blank" 
                         rel="noopener">
@@ -92,6 +93,7 @@ foreach($catlist as $childcat) {
                 </div>
            </div> <!-- /.course -->
 	<?php endwhile; ?>
+</div>
 </div>
 <div style="clear: both">
 	<?php twenty_twenty_one_the_posts_navigation(); ?>
