@@ -564,138 +564,153 @@ function course_save_course_link_meta ( $post_id, $post ) {
 
 
 
-
-
 /**
- * Register columns for our taxonomy
- */
-function learning_partner_register_category_columns( $columns ) {
-    $columns['partner-url'] = __( 'Partner URL', 'generatewp' );
-    return $columns;
-}
-add_filter( 'manage_edit-learning_partner_columns', 'learning_partner_register_category_columns' );
+ * Plugin class
+ **/
+if ( ! class_exists( 'CT_TAX_META' ) ) {
 
-/**
- * Retrieve value for our custom column
- * 
- * @param string $string      Blank string.
- * @param string $column_name Name of the column.
- * @param int    $term_id     Term ID.
- */
-function learning_partner_category_column_display( $string = '', $column_name, $term_id ) {
-    return esc_html( get_term_meta( $term_id, $column_name, true ) ); // XSS ok.
-}
-add_filter( 'learning_partner_custom_column', 'learning_partner_category_column_display', 10, 3 );
-
-
-
-
-
-
-
-/**
- * Display markup or template for custom field
- */
-function learning_hub_quick_edit_category_field( $column_name, $screen ) {
-    // If we're not iterating over our custom column, then skip
-    if ( $screen != 'learning_partner' && $column_name != 'partner-url') {
-        return false;
-    }
-    ?>
-    <fieldset>
-        <div id="learning-hub-partner-url" class="inline-edit-col">
-            <label>
-                <span class="title"><?php _e( 'Partner URL', 'generatewp' ); ?></span>
-                <span class="input-text-wrap">
-                    <input type="text" name="<?php echo esc_attr( $column_name ); ?>" class="ptitle" value="">
-                </span>
-            </label>
-        </div>
-    </fieldset>
-    <?php
-}
-add_action( 'quick_edit_custom_box', 'learning_hub_quick_edit_category_field', 10, 2 );
-
-/**
- * Callback runs when category is updated
- * Will save user-provided input into the wp_termmeta DB table
- */
-function learning_partner_quick_edit_save_category_field( $term_id ) {
-    if ( isset( $_POST['partner-url'] ) ) {
-        // security tip: kses
-        update_term_meta( $term_id, 'partner-url', $_POST['partner-url'] );
-    }
-}
-add_action( 'edited_learning_partner', 'learning_partner_quick_edit_save_category_field' );
-
-/**
- * Front-end stuff for pulling in user-input values dynamically
- * into our input field.
- */
-function learning_partner_quickedit_category_javascript() {
-    $current_screen = get_current_screen();
-
-    if ( $current_screen->id != 'edit-learning_partner' || $current_screen->taxonomy != 'learning_partner' ) {
-        return;
-    }
-
-    // Ensure jQuery library is loaded
-    wp_enqueue_script( 'jquery' );
-    ?>
-    <script type="text/javascript">
-        /*global jQuery*/
-        jQuery(function($) {
-            $('#the-list').on( 'click', 'a.editinline', function( e ) {
-    			e.preventDefault();
-    			var $tr = $(this).closest('tr');
-    			var val = $tr.find('td.partner-url').text();
-    			// Update field
-    			$('tr.inline-edit-row :input[name="partner-url"]').val(val ? val : '');
-    		});
-        });
-    </script>
-    <?php
-}
-add_action( 'admin_print_footer_scripts-edit-tags.php', 'learning_partner_quickedit_category_javascript' );
-
-
-add_action('learning_partner_edit_form_fields','learning_partner_edit_form_fields');
-add_action('learning_partner_edit_form', 'learning_partner_edit_form');
-add_action('learning_partner_add_form_fields','learning_partner_edit_form_fields');
-add_action('learning_partner_add_form','learning_partner_edit_form');
-
-
-function learning_partner_edit_form() {
-?>
-<script type="text/javascript">
-jQuery(document).ready(function(){
-jQuery('#edittag').attr( "enctype", "multipart/form-data" ).attr( "encoding", "multipart/form-data" );
-        });
-</script>
-<?php 
-}
-
-function learning_partner_edit_form_fields () {
-?>
-    <tr class="form-field">
-            <th valign="top" scope="row">
-                <label for="partner-url"><?php _e('Partner URL', ''); ?></label>
-            </th>
-            <td>
-                <input type="text" id="partner-url" name="partner-url">
-            </td>
-        </tr>
-        <?php 
+    class CT_TAX_META {
+    
+      public function __construct() {
+        //
+      }
+    
+     /*
+      * Initialize the class and start calling our hooks and filters
+      * @since 1.0.0
+     */
+     public function init() {
+       add_action( 'learning_partner_add_form_fields', array ( $this, 'add_category_image' ), 10, 2 );
+       add_action( 'created_learning_partner', array ( $this, 'save_category_image' ), 10, 2 );
+       add_action( 'learning_partner_edit_form_fields', array ( $this, 'update_category_image' ), 10, 2 );
+       add_action( 'edited_learning_partner', array ( $this, 'updated_category_image' ), 10, 2 );
+       add_action( 'admin_enqueue_scripts', array( $this, 'load_media' ) );
+       add_action( 'admin_footer', array ( $this, 'add_script' ) );
+     }
+    
+    public function load_media() {
+     wp_enqueue_media();
     }
     
-    /**
- * Callback runs when category is updated
- * Will save user-provided input into the wp_termmeta DB table
- */
-function learning_partner_save_category_field( $term_id ) {
-    if ( isset( $_POST['partner-url'] ) ) {
-        // security tip: kses
-        update_term_meta( $term_id, 'partner-url', $_POST['partner-url'] );
+     /*
+      * Add a form field in the new category page
+      * @since 1.0.0
+     */
+     public function add_category_image ( $taxonomy ) { ?>
+       <div class="form-field term-group">
+         <label for="category-image-id"><?php _e('Partner Logo', 'twentytwentyone-learning-hub-theme'); ?></label>
+         <input type="hidden" id="category-image-id" name="category-image-id" class="custom_media_url" value="">
+         <div id="category-image-wrapper"></div>
+         <p>
+           <input type="button" class="button button-secondary ct_tax_media_button" id="ct_tax_media_button" name="ct_tax_media_button" value="<?php _e( 'Add Image', 'hero-theme' ); ?>" />
+           <input type="button" class="button button-secondary ct_tax_media_remove" id="ct_tax_media_remove" name="ct_tax_media_remove" value="<?php _e( 'Remove Image', 'hero-theme' ); ?>" />
+        </p>
+       </div>
+     <?php
+     }
+    
+     /*
+      * Save the form field
+      * @since 1.0.0
+     */
+     public function save_category_image ( $term_id, $tt_id ) {
+       if( isset( $_POST['category-image-id'] ) && '' !== $_POST['category-image-id'] ){
+         $image = $_POST['category-image-id'];
+         add_term_meta( $term_id, 'category-image-id', $image, true );
+       }
+     }
+    
+     /*
+      * Edit the form field
+      * @since 1.0.0
+     */
+     public function update_category_image ( $term, $taxonomy ) { ?>
+       <tr class="form-field term-group-wrap">
+         <th scope="row">
+           <label for="category-image-id"><?php _e('Partner Logo', 'twentytwentyone-learning-hub-theme'); ?></label>
+         </th>
+         <td>
+           <?php $image_id = get_term_meta ( $term -> term_id, 'category-image-id', true ); ?>
+           <input type="hidden" id="category-image-id" name="category-image-id" value="<?php echo $image_id; ?>">
+           <div id="category-image-wrapper">
+             <?php if ( $image_id ) { ?>
+               <?php echo wp_get_attachment_image ( $image_id, 'thumbnail' ); ?>
+             <?php } ?>
+           </div>
+           <p>
+             <input type="button" class="button button-secondary ct_tax_media_button" id="ct_tax_media_button" name="ct_tax_media_button" value="<?php _e( 'Add Image', 'hero-theme' ); ?>" />
+             <input type="button" class="button button-secondary ct_tax_media_remove" id="ct_tax_media_remove" name="ct_tax_media_remove" value="<?php _e( 'Remove Image', 'hero-theme' ); ?>" />
+           </p>
+         </td>
+       </tr>
+     <?php
+     }
+    
+    /*
+     * Update the form field value
+     * @since 1.0.0
+     */
+     public function updated_category_image ( $term_id, $tt_id ) {
+       if( isset( $_POST['category-image-id'] ) && '' !== $_POST['category-image-id'] ){
+         $image = $_POST['category-image-id'];
+         update_term_meta ( $term_id, 'category-image-id', $image );
+       } else {
+         update_term_meta ( $term_id, 'category-image-id', '' );
+       }
+     }
+    
+    /*
+     * Add script
+     * @since 1.0.0
+     */
+     public function add_script() { ?>
+       <script>
+         jQuery(document).ready( function($) {
+           function ct_media_upload(button_class) {
+             var _custom_media = true,
+             _orig_send_attachment = wp.media.editor.send.attachment;
+             $('body').on('click', button_class, function(e) {
+               var button_id = '#'+$(this).attr('id');
+               var send_attachment_bkp = wp.media.editor.send.attachment;
+               var button = $(button_id);
+               _custom_media = true;
+               wp.media.editor.send.attachment = function(props, attachment){
+                 if ( _custom_media ) {
+                   $('#category-image-id').val(attachment.id);
+                   $('#category-image-wrapper').html('<img class="custom_media_image" src="" style="margin:0;padding:0;max-height:100px;float:none;" />');
+                   $('#category-image-wrapper .custom_media_image').attr('src',attachment.url).css('display','block');
+                 } else {
+                   return _orig_send_attachment.apply( button_id, [props, attachment] );
+                 }
+                }
+             wp.media.editor.open(button);
+             return false;
+           });
+         }
+         ct_media_upload('.ct_tax_media_button.button'); 
+         $('body').on('click','.ct_tax_media_remove',function(){
+           $('#category-image-id').val('');
+           $('#category-image-wrapper').html('<img class="custom_media_image" src="" style="margin:0;padding:0;max-height:100px;float:none;" />');
+         });
+         // Thanks: http://stackoverflow.com/questions/15281995/wordpress-create-category-ajax-response
+         $(document).ajaxComplete(function(event, xhr, settings) {
+           var queryStringArr = settings.data.split('&');
+           if( $.inArray('action=add-tag', queryStringArr) !== -1 ){
+             var xml = xhr.responseXML;
+             $response = $(xml).find('term_id').text();
+             if($response!=""){
+               // Clear the thumb image
+               $('#category-image-wrapper').html('');
+             }
+           }
+         });
+       });
+     </script>
+     <?php }
+    
+      }
+    
+    $CT_TAX_META = new CT_TAX_META();
+    $CT_TAX_META -> init();
+    
     }
-}
-add_action( 'edited_learning_partner', 'learning_partner_save_category_field' );
