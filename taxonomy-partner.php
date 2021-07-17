@@ -14,28 +14,65 @@ get_header();
 $description = get_the_archive_description();
 $term = get_term_by( 'slug', get_query_var( 'term' ), get_query_var( 'taxonomy' ) );
 $parent = get_term($term->parent, get_query_var('taxonomy') ); // get parent term
+
+
+    $partnerurl = '';
+    $partnerlogo = '';
+    $term_vals = get_term_meta($term->term_id);
+    foreach($term_vals as $key=>$val){
+        //echo $val[0] . '<br>';
+        if($key == 'partner-url') {
+            $partnerurl = $val[0];
+        }
+        if($key == 'category-image-id') {
+            $partnerlogo = $val[0];
+        }
+        
+    } 
+
+
 ?>
 
-<?php if ( have_posts() ) : ?>
 
-	<header class="entry-header alignfull" style="background: #FFF; padding: 2em 2em 3em 2em;">
-		<div class="alignwide">
-		<div><small>Learning Partner</small></div>
-	<?php if(!empty($parent->slug)): ?>
-	<div>
-		<a href="/portal/course_category/<?php echo $parent->slug ?>">
-			<?php echo $parent->name ?>
-		</a>
-	</div>
-	<?php endif ?>
+<?php if ( have_posts() ) : ?>
+	
+<div class="white-wrap">
+<div class="wp-block-columns alignwide" id="partnertop">
+<div class="wp-block-column" style="flex-basis:33.33%">
+	<?php if(!empty($partnerlogo)): ?>
+    <?php $image_attributes = wp_get_attachment_image_src( $attachment_id = $partnerlogo, $size = 'large' ) ?>
+    <?php if ( $image_attributes ) : ?>
+    <div style="margin-top: 2em; text-align:center;">
+    <img src="<?php echo $image_attributes[0]; ?>" 
+            width="<?php echo $image_attributes[1]; ?>" 
+            height="<?php echo $image_attributes[2]; ?>">
+    </div>
+    <?php endif; ?>
+    <?php endif; ?>
+</div>
+<div class="wp-block-column">
+	<div><a class="allpartnerslink" href="/portal/corporate-learning-partners/">All Partners</a></div>
 	<h1><?php echo $term->name ?></h1>
 		<?php //the_archive_title( '<h1 class="page-title">', '</h1>' ); ?>
 		<?php if ( $description ) : ?>
 			<div class=""><?php echo wp_kses_post( wpautop( $description ) ); ?></div>
 		<?php endif; ?>
-		</div>
-	</header><!-- .page-header -->
-	<div class="alignwide">
+		<?php if(!empty($partnerurl)): ?>
+    <div>
+        <a class="partner-url" 
+            target="_blank" 
+            rel="noopener" 
+            href="<?= $partnerurl ?>">
+                View Partner Website
+        </a>
+    </div>
+    <?php endif ?>
+
+</div>
+</div>
+</div>
+
+
 <?php 
 // Get a list of all sub-categories and output them as simple links
 $catlist = get_categories(
@@ -54,11 +91,11 @@ foreach($catlist as $childcat) {
 //print_r($catlist);
 ?>
 </div>
-<div class="alignwide">
+<div class="entry-content">
 	<?php while ( have_posts() ) : ?>
 		<?php the_post(); ?>
 		<div class="course">
-                <div style="background: #3a9bd9; height: 6px; width: 25%;"></div> 
+			<div style="background: #28537d; height: 6px; width: 100%;"></div> 
                 <div class="coursename">
                 <a  href="<?php echo get_permalink(); ?>">
                     <?= the_title(); ?>
@@ -76,7 +113,7 @@ foreach($catlist as $childcat) {
                         <?php the_terms( $post->ID, 'course_category', 'Categories: ', ', ', ' ' ); ?>
                     </div>
                     <div class="courseregister">
-                    <a style="background: #3a9bd9; color: #F2F2F2; font-size: 1.2rem; padding: .5em 1em; text-align: center; text-decoration: none;" 
+                    <a style="background: #28537d; color: #F2F2F2; font-size: 1.2rem; padding: .5em 1em; text-align: center; text-decoration: none;" 
                         href="<?= $post->course_link ?>" 
                         target="_blank" 
                         rel="noopener">

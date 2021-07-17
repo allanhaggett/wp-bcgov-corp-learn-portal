@@ -605,7 +605,11 @@ if ( ! class_exists( 'CT_TAX_META' ) ) {
            <input type="button" class="button button-secondary ct_tax_media_button" id="ct_tax_media_button" name="ct_tax_media_button" value="<?php _e( 'Add Image', 'hero-theme' ); ?>" />
            <input type="button" class="button button-secondary ct_tax_media_remove" id="ct_tax_media_remove" name="ct_tax_media_remove" value="<?php _e( 'Remove Image', 'hero-theme' ); ?>" />
         </p>
-       </div>
+        </div>
+        <div class="form-field term-group">
+          <label for="partner-url">Partner URL</label>
+           <input type="text" id="partner-url" name="partner-url" class="" value="">
+        </div>
      <?php
      }
     
@@ -618,6 +622,10 @@ if ( ! class_exists( 'CT_TAX_META' ) ) {
          $image = $_POST['category-image-id'];
          add_term_meta( $term_id, 'category-image-id', $image, true );
        }
+       if( isset( $_POST['partner-url'] ) && '' !== $_POST['partner-url'] ){
+        $url = $_POST['partner-url'];
+        add_term_meta( $term_id, 'partner-url', $url, true );
+      }
      }
     
      /*
@@ -641,8 +649,20 @@ if ( ! class_exists( 'CT_TAX_META' ) ) {
              <input type="button" class="button button-secondary ct_tax_media_button" id="ct_tax_media_button" name="ct_tax_media_button" value="<?php _e( 'Add Image', 'hero-theme' ); ?>" />
              <input type="button" class="button button-secondary ct_tax_media_remove" id="ct_tax_media_remove" name="ct_tax_media_remove" value="<?php _e( 'Remove Image', 'hero-theme' ); ?>" />
            </p>
+
          </td>
        </tr>
+       <tr class="form-field term-group-wrap">
+         <th scope="row">
+           <label for="category-image-id"><?php _e('Partner URL', 'twentytwentyone-learning-hub-theme'); ?></label>
+         </th>
+         <td>
+         <div class="form-field term-group">
+              <?php $url = get_term_meta ( $term -> term_id, 'partner-url', true ); ?>
+              <input type="text" id="partner-url" name="partner-url" class="" value="<?= $url ?>">
+            </div>
+        </td>
+        </tr>
      <?php
      }
     
@@ -657,6 +677,12 @@ if ( ! class_exists( 'CT_TAX_META' ) ) {
        } else {
          update_term_meta ( $term_id, 'category-image-id', '' );
        }
+       if( isset( $_POST['partner-url'] ) && '' !== $_POST['partner-url'] ){
+        $url = $_POST['partner-url'];
+        update_term_meta ( $term_id, 'partner-url', $url );
+      } else {
+        update_term_meta ( $term_id, 'partner-url', '' );
+      }
      }
     
     /*
