@@ -92,6 +92,11 @@ foreach($catlist as $childcat) {
 ?>
 </div>
 <div class="entry-content">
+    <div id="courselist">
+    <div class="searchbox">
+    <input class="search form-control mb-3" placeholder="Type to filter courses">
+	</div>
+	<div class="list">
 	<?php while ( have_posts() ) : ?>
 		<?php the_post(); ?>
 		<div class="course">
@@ -124,6 +129,8 @@ foreach($catlist as $childcat) {
            </div> <!-- /.course -->
 	<?php endwhile; ?>
 </div>
+</div>
+</div>
 <div style="clear: both">
 	<?php twenty_twenty_one_the_posts_navigation(); ?>
 </div>
@@ -131,4 +138,19 @@ foreach($catlist as $childcat) {
 	<?php get_template_part( 'template-parts/content/content-none' ); ?>
 <?php endif; ?>
 
+<script src="//cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+<script>
+
+var courseoptions = {
+    valueNames: [ 'coursename', 'coursedesc', 'coursecats', 'coursekeys' ]
+};
+var courses = new List('courselist', courseoptions);
+document.getElementById('coursecount').innerHTML = courses.update().matchingItems.length;
+courses.on('searchComplete', function(){
+    //console.log(upcomingClasses.update().matchingItems.length);
+    //console.log(courses.update().matchingItems.length);
+    document.getElementById('coursecount').innerHTML = courses.update().matchingItems.length;
+});
+
+</script>
 <?php get_footer(); ?>
