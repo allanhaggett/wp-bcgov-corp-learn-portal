@@ -33,25 +33,27 @@ $parent = get_term($term->parent, get_query_var('taxonomy') ); // get parent ter
 		<?php endif ?>
 	</div>
 	
-	<h1><?php echo $term->name ?></h1>
+	<h1><?php echo $term->name ?> Courses</h1>
 		<?php //the_archive_title( '<h1 class="page-title">', '</h1>' ); ?>
 		<?php if ( $description ) : ?>
 			<div class="archive-description"><?php echo wp_kses_post( wpautop( $description ) ); ?></div>
 		<?php endif; ?>
+		
 <div class="" style="margin: 1em 0 0 0;">
 <?php 
 // Get a list of all sub-categories and output them as simple links
-$catlist = get_categories(
+$methodlist = get_categories(
 						array(
-							'taxonomy' => 'course_category',
-							'child_of' => $term->term_id,
+							'taxonomy' => 'delivery_method',
 							'orderby' => 'id',
 							'order' => 'DESC',
-							'hide_empty' => '0'
+							'hide_empty' => 1
 						));
 
-foreach($catlist as $childcat) {
-	echo '<a href="/portal/course_category/'. $childcat->slug . '">' . $childcat->name . '</a> | ';
+foreach($methodlist as $method) {
+	$active = '';
+	if($method->name == $term->name) $active = 'active';
+	echo '<a class="'.$active.'" href="/portal/delivery_method/'. $method->slug . '">' . $method->name . '</a> | ';
 }
 
 //print_r($catlist);

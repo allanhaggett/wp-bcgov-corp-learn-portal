@@ -56,7 +56,7 @@ $lastletter = '';
     <div style="background: #FFF; border-radius: 3px; margin: 1em 0; padding: 1em;">
     <div>
         <?php echo $post_my_query->post_count; ?> 
-        courses in 3 top-level categories from 10 
+        courses in 3 top-level categories from 14 
         <a href="/portal/corporate-learning-partners/">Learning Partners</a>
     </div>
 
@@ -140,40 +140,7 @@ $lastletter = '';
                 }
             }
             
-            ?>
-            
-            <div class="course">
-                <div style="background: #28537d; height: 6px; width: 100%;"></div> 
-                <div class="coursename">
-                <a  href="<?php echo get_permalink(); ?>">
-                    <?= the_title(); ?>
-                </a>
-                <!-- <a href="#course-<?= $post->ID ?>" class="showdeets">#</a> -->
-                </div>
-                <div class="details" id="course-<?= $post->ID ?>">
-                    <div class="learningpartner">
-                        <?php the_terms( $post->ID, 'learning_partner', 'Offered by: ', ', ', ' ' ); ?>
-                    </div>
-                    <div class="coursedesc">
-                        <?php the_content(); ?>
-                    </div>
-                    <div class="coursecats">
-                        <?php the_terms( $post->ID, 'course_category', 'Categories: ', ', ', ' ' ); ?>
-                    </div>
-                    <div class="coursekeys" style="display:none">
-                        <?php the_terms( $post->ID, 'keywords', 'Keywords: ', ', ', ' ' ); ?>
-                    </div>
-                    <div class="courseregister">
-                    <a style="background: #28537d; color: #F2F2F2; font-size: 1.2rem; padding: .5em 1em; text-align: center; text-decoration: none;" 
-                        href="<?= $post->course_link ?>" 
-                        target="_blank" 
-                        rel="noopener">
-                            Register Here +
-                    </a>
-                    </div>
-                </div>
-           </div> <!-- /.course -->
-            <?php
+            get_template_part( 'template-parts/course/single-course' );
             
             $lastletter = $firstletter;
 

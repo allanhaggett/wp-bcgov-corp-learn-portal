@@ -269,14 +269,17 @@ function course_archive_template( $archive_template ) {
 }
 
 function course_tax_template( $tax_template ) {
-    global $post;
-    if ( is_tax ( 'course_category' ) ) {
-         $tax_template = dirname( __FILE__ ) . '/taxonomy.php';
-    }
-    if ( is_tax ( 'learning_partner' ) ) {
-        $tax_template = dirname( __FILE__ ) . '/taxonomy-partner.php';
-   }
-    return $tax_template;
+  global $post;
+  if ( is_tax ( 'course_category' ) ) {
+    $tax_template = dirname( __FILE__ ) . '/taxonomy.php';
+  }
+  if ( is_tax ( 'learning_partner' ) ) {
+    $tax_template = dirname( __FILE__ ) . '/taxonomy-partner.php';
+  }
+  if ( is_tax ( 'delivery_method' ) ) {
+    $tax_template = dirname( __FILE__ ) . '/taxonomy-delivery-method.php';
+  }
+  return $tax_template;
 }
 
 add_filter( 'single_template', 'load_course_template' );
