@@ -410,7 +410,6 @@ function course_elm_sync() {
                 $updated = 0;
             } else {
                 // set up the new course with basic settings in place
-                // #FIXME these values probably ought to be escaped properly
                 $new_course = array(
                     'post_title' => sanitize_text_field($course->title),
                     'post_type' => 'course',
