@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: BC Gov Corporate Learning Portal
-Plugin URI: https://github.com/allanhaggett/wp-bcgov-corp-learn-portal
+Plugin Name: BC Gov Corporate Learning Hub
+Plugin URI: https://github.com/allanhaggett/wp-bcgov-learning-hub
 Description: A gateway to everything that BC Gov has to offer for learning opportunities.
 Author: Allan Haggett <allan.haggett@gov.bc.ca>
 Version: 1
-Author URI: https://learninghub.gww.gov.bc.ca
+Author URI: https://learningcenter.gww.gov.bc.ca/hub
 */
 
 
@@ -352,12 +352,7 @@ function course_elm_sync() {
     $feed = file_get_contents('https://learn.bcpublicservice.gov.bc.ca/learning-hub/learning-partner-courses.json');
     $courses = json_decode($feed);
     echo '<h3>' . count($courses->items) . ' Courses.</h3>';
-    /**
-     * #TODO Note that course titles have a convention for courses which are restricted to certain groups:
-     * {RESTRICTED TO MinX and TEAMS}
-     * I think that it would good to parse these strings out into taxonomy terms, making it easier
-     * to look up courses for a given Ministry.
-     */
+
     $existingcourses = [];
     $newcourses = [];
     foreach($courses->items as $course) {
@@ -413,6 +408,7 @@ function course_elm_sync() {
                 $updated = 0;
             } else {
                 // set up the new course with basic settings in place
+                // #FIXME these values probably ought to be escaped properly
                 $new_course = array(
                     'post_title' => $course->title,
                     'post_type' => 'course',
@@ -457,32 +453,6 @@ function course_elm_sync() {
     }
 
 }
-
-// First we create a function
-function list_terms_custom_taxonomy( $atts ) {
- 
-    // Inside the function we extract custom taxonomy parameter of our shortcode
-    extract( shortcode_atts( array(
-        'custom_taxonomy' => '',
-    ), $atts ) );
-     
-    // arguments for function wp_list_categories
-    $args = array( 
-            'taxonomy' => $custom_taxonomy,
-            'title_li' => ''
-    );
-     
-    // We wrap it in unordered list 
-    echo '<ul>'; 
-    echo wp_list_categories($args);
-    echo '</ul>';
-}
-
-// Add a shortcode that executes our function
-add_shortcode( 'ct_terms', 'list_terms_custom_taxonomy' );
-
-//Allow Text widgets to execute shortcodes
-add_filter('widget_text', 'do_shortcode');
 
 /* Fire our meta box setup function on the post editor screen. */
 add_action( 'load-post.php', 'courses_meta_boxes_setup' );
@@ -560,10 +530,6 @@ function course_save_course_link_meta ( $post_id, $post ) {
         delete_post_meta( $post_id, $meta_key, $meta_value );
     }
 }
-
-
-
-
 
 
 
