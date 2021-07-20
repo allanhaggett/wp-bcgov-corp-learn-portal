@@ -380,7 +380,8 @@ function course_elm_sync() {
                 // perhaps at the top when we set everything to private
                 $cats = explode(',', $course->tags);
                 foreach($cats as $cat) {
-                    wp_set_object_terms( $existingcourse->ID, $cat, 'course_category', true);
+                    $catesc = sanitize_text_field($cat);
+                    wp_set_object_terms( $existingcourse->ID, $catesc, 'course_category', true);
                 }
                 // For the keywords, we're just going to run through and
                 // add them all in whether they exist already or not; if
@@ -391,6 +392,7 @@ function course_elm_sync() {
                 // perhaps at the top when we set everything to private
                 $keywords = explode(',', $course->_keywords);
                 foreach($keywords as $key) {
+                    $keyesc = sanitize_text_field($key);
                     wp_set_object_terms( $existingcourse->ID, $key, 'keywords', true);
                 }
 
@@ -410,34 +412,36 @@ function course_elm_sync() {
                 // set up the new course with basic settings in place
                 // #FIXME these values probably ought to be escaped properly
                 $new_course = array(
-                    'post_title' => $course->title,
+                    'post_title' => sanitize_text_field($course->title),
                     'post_type' => 'course',
                     'post_status' => 'publish', 
-                    'post_content' => $course->summary,
-                    'post_excerpt' => substr($course->summary, 0, 100),
+                    'post_content' => sanitize_text_field($course->summary),
+                    'post_excerpt' => substr(sanitize_text_field($course->summary), 0, 100),
                     'meta_input'   => array(
-                        'course_link' => $course->url,
-                        'elm_course_code' => $course->id
+                        'course_link' => esc_url_raw($course->url),
+                        'elm_course_code' => (int) $course->id
                     )
                 );
                 // Actually create the new post so that we can move on 
                 // to updating it with taxonomy etc
                 $post_id = wp_insert_post( $new_course );
 
-                wp_set_object_terms( $post_id, $course->delivery_method, 'delivery_method', false);
-                wp_set_object_terms( $post_id, $course->_learning_partner, 'learning_partner', false);
+                wp_set_object_terms( $post_id, sanitize_text_field($course->delivery_method), 'delivery_method', false);
+                wp_set_object_terms( $post_id, sanitize_text_field($course->_learning_partner), 'learning_partner', false);
                 wp_set_object_terms( $post_id, 'PSA Learning System', 'external_system', false);
 
                 if(!empty($course->_keywords)) {
                     $keywords = explode(',', $course->_keywords);
                     foreach($keywords as $key) {
-                        wp_set_object_terms( $post_id, $key, 'keywords', true);
+                        $keyesc = sanitize_text_field($key);
+                        wp_set_object_terms( $post_id, $keyesc, 'keywords', true);
                     }
                 }
                 if(!empty($course->tags)) {
                     $cats = explode(',', $course->tags);
                     foreach($cats as $cat) {
-                        wp_set_object_terms( $post_id, $cat, 'course_category', true);
+                      $catesc = sanitize_text_field($cat);
+                        wp_set_object_terms( $post_id, $catesc, 'course_category', true);
                     }
                 }
 
@@ -446,7 +450,7 @@ function course_elm_sync() {
         }
     }
     
-
+    echo '<h1>' . count($newcourses) . ' new courses created.</h1>';
     echo '<h1>Updated Courses</h1>';
     foreach($existingcourses as $ex) {
         echo $ex->post_title . ' updated<br>';
