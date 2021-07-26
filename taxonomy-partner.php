@@ -99,34 +99,7 @@ foreach($catlist as $childcat) {
 	<div class="list">
 	<?php while ( have_posts() ) : ?>
 		<?php the_post(); ?>
-		<div class="course">
-			<div style="background: #28537d; height: 6px; width: 100%;"></div> 
-                <div class="coursename">
-                <a  href="<?php echo get_permalink(); ?>">
-                    <?= the_title(); ?>
-                </a>
-                <!-- <a href="#course-<?= $post->ID ?>" class="showdeets">#</a> -->
-                </div>
-                <div class="details" id="course-<?= $post->ID ?>">
-                    <div class="learningpartner">
-                        <?php the_terms( $post->ID, 'learning_partner', 'Offered by: ', ', ', ' ' ); ?>
-                    </div>
-                    <div class="coursedesc">
-                        <?php the_content(); ?>
-                    </div>
-                    <div class="coursecats">
-                        <?php the_terms( $post->ID, 'course_category', 'Categories: ', ', ', ' ' ); ?>
-                    </div>
-                    <div class="courseregister">
-                    <a style="background: #28537d; color: #F2F2F2; font-size: 1.2rem; padding: .5em 1em; text-align: center; text-decoration: none;" 
-                        href="<?= $post->course_link ?>" 
-                        target="_blank" 
-                        rel="noopener">
-                            Register Here +
-                    </a>
-                    </div>
-                </div>
-           </div> <!-- /.course -->
+		<?php get_template_part( 'template-parts/course/single-course' ) ?>
 	<?php endwhile; ?>
 </div>
 </div>
@@ -141,7 +114,7 @@ foreach($catlist as $childcat) {
 <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
 <script>
 
-var courseoptions = {
+var courseoptions =  ?>
     valueNames: [ 'coursename', 'coursedesc', 'coursecats', 'coursekeys' ]
 };
 var courses = new List('courselist', courseoptions);
