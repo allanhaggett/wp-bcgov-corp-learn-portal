@@ -13,10 +13,9 @@ get_header();
 
 $description = get_the_archive_description();
 
-$post_type = 'course'; //your post type name here
 $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
 $post_args=array(
-    'post_type'                => $post_type,
+    'post_type'                => 'course',
     'post_status'              => 'publish',
     'posts_per_page'           => 300,
     'paged'                    => $paged, 
@@ -34,127 +33,75 @@ $post_args=array(
 );
 $post_my_query = null;
 $post_my_query = new WP_Query($post_args);
-$lastletter = '';
-
+$categories = get_terms( 
+    'course_category', 
+    array('parent' => 0)
+);
 ?>
+<div class="dark-wrap">
+<div class="wp-block-columns alignwide" id="pagetop">
+<div class="wp-block-column" style="flex-basis:33.33%">
+<figure class="post-thumbnail">
+    <img src="https://lc.virtuallearn.ca/portal/wp-content/uploads/sites/6/2021/06/hero-2.jpg" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="" srcset="https://lc.virtuallearn.ca/portal/wp-content/uploads/sites/6/2021/06/hero-2.jpg 888w, https://lc.virtuallearn.ca/portal/wp-content/uploads/sites/6/2021/06/hero-2-300x225.jpg 300w, https://lc.virtuallearn.ca/portal/wp-content/uploads/sites/6/2021/06/hero-2-768x575.jpg 768w" sizes="(max-width: 888px) 100vw, 888px" style="width:100%;height:74.89%;max-width:888px;" width="888" height="665">
+</figure>
+</div>
+<div class="wp-block-column">
+    <div style="padding: 2em 0;">
 
-    <div class="alignwide">
-
-	<div class="">
-    <?php
-    //  wp_list_categories( array(
-	//  	'taxonomy' => 'course_category',
-    //     'orderby' => 'name',
-	// 	'title_li' => '',
-    //     'depth' => 1
-    // ) );
-    $categories = get_terms( 
-        'course_category', 
-        array('parent' => 0)
-     );
-    ?>
-    <div style="background: #FFF; border-radius: 3px; margin: 1em 0; padding: 1em;">
+    <h1>Courses</h1>
+    <div style="padding: 1em 0;">
+    <?php echo $post_my_query->post_count; ?> 
+    courses in 3 top-level categories from 14 
+    <a href="/portal/corporate-learning-partners/" style="color: #FFF">Learning Partners</a>
+    </div>
     <div>
-        <?php echo $post_my_query->post_count; ?> 
-        courses in 3 top-level categories from 14 
-        <a href="/portal/corporate-learning-partners/">Learning Partners</a>
-    </div>
-
+    <?php foreach( $categories as $category ): ?>
+    <?php if($category->name == "Ministry") continue ?>
     <?php 
-    foreach( $categories as $category ):
-        if($category->name == "Ministry") continue;
-        $category_link = sprintf( 
-            '<a href="%1$s" alt="%2$s" class="coursecat">%3$s</a>',
-            esc_url( get_category_link( $category->term_id ) ),
-            esc_attr( sprintf( __( 'View all posts in %s', 'textdomain' ), $category->name ) ),
-            esc_html( $category->name )
-        );
-        echo '' . sprintf( esc_html__( '%s', 'textdomain' ), $category_link ) . ' ';
-     
-    endforeach ?>
-    </div>
-    
-    <div id="courselist">
-    <div class="searchbox">
-    <input class="search form-control mb-3" placeholder="Search">
-    <!-- <div><span id="coursecount"></span> courses</div> -->
+    $category_link = sprintf( 
+        '<a href="%1$s" alt="%2$s" class="coursecat">%3$s</a>',
+        esc_url( get_category_link( $category->term_id ) ),
+        esc_attr( sprintf( __( 'View all posts in %s', 'textdomain' ), $category->name ) ),
+        esc_html( $category->name )
+    );
+    ?>
 
-    <?php if( $post_my_query->have_posts() ) : ?>
+    <?= sprintf( esc_html__( '%s', 'textdomain' ), $category_link ) . ' ' ?>
 
-   </div>
-    <style>
-    .alphabet a {
-        background: #F1F1F1;
-        border-radius: 3px;
-        display: inline-block;
-        font-size: .6em;
-        margin: 0 .15em;
-        padding: .25em .5em;
-        text-decoration: none;
-    }
-    </style>
-    <div class="alphabet" style="text-align: center;">
-        <a href="#A">A</a>
-        <a href="#B">B</a>
-        <a href="#C">C</a>
-        <a href="#D">D</a>
-        <a href="#E">E</a>
-        <a href="#F">F</a>
-        <a href="#G">G</a>
-        <a href="#H">H</a>
-        <a href="#I">I</a>
-        <a href="#J">J</a>
-        <a href="#K">K</a>
-        <a href="#L">L</a>
-        <a href="#M">M</a>
-        <a href="#N">N</a>
-        <a href="#O">O</a>
-        <a href="#P">P</a>
-        <a href="#Q">Q</a>
-        <a href="#R">R</a>
-        <a href="#S">S</a>
-        <a href="#T">T</a>
-        <a href="#U">U</a>
-        <a href="#V">V</a>
-        <a href="#W">W</a>
-        <a href="#X">X</a>
-        <a href="#Y">Y</a>
-        <a href="#Z">Z</a>
-    </div> <!-- /.alphabet -->
-    
- 
-    
-    <div class="entry-content">
-    <div class="list">
-        <?php
-            while ($post_my_query->have_posts()) : $post_my_query->the_post(); 
 
-            $title = get_the_title();
-            $firstletter = substr($title, 0, 1);
-            $secondletter = substr($title, 0, 2);
-            
-                
-            if($firstletter != '{' && $firstletter != '(') {            
-                if($firstletter != $lastletter) {
-                    echo '<h2 id="' . $firstletter . '">' . $firstletter . '</h2>';
-                }
-            }
-            
-            get_template_part( 'template-parts/course/single-course' );
-            
-            $lastletter = $firstletter;
+    <?php endforeach ?>
+</div>
+</div>
+</div>
+</div>
+</div>
 
-           endwhile;
-       ?>
-    </div>
-    </div>
-    </div>
+<div class="entry-content" id="courselist" style="margin-top: 1em;">
+<div class="searchbox">
+<input class="search form-control mb-3" placeholder="Search">
+<!-- <div><span id="coursecount"></span> courses</div> -->
+
+<?php if( $post_my_query->have_posts() ) : ?>
+
+</div>    
+<div class="entry-content">
+<div class="list">
+<?php
+while ($post_my_query->have_posts()) : $post_my_query->the_post(); 
+
+get_template_part( 'template-parts/course/single-course' );
+
+endwhile;
+?>
+</div>
+</div>
+</div>
 <?php
 else :      
     echo '<p>No Courses Found!</p>';   
 endif;
 wp_reset_query($post_my_query);
-//the_posts_navigation(); 
+
 ?>
 </div>
 </div>
