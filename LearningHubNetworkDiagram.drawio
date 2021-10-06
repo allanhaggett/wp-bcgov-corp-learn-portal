@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2021-10-06T19:23:26.853Z" agent="5.0 (Windows)" etag="cMX-ge_xJfJXEH6f2ZlS" version="14.8.0" type="github">
+<mxfile host="app.diagrams.net" modified="2021-10-06T19:26:53.963Z" agent="5.0 (Windows)" etag="h9jYFMiU7LQtDY53yNLw" version="14.8.0" type="github">
   <diagram id="1HEpcO4DPhFORU9fRaos" name="Page-1">
     <mxGraphModel dx="1038" dy="536" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -32,7 +32,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="hevnwnW_VP5BSD5cbGkB-6" value="NIKep" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="220" y="380" width="120" height="80" as="geometry" />
+          <mxGeometry x="270" y="370" width="120" height="80" as="geometry" />
         </mxCell>
         <mxCell id="hevnwnW_VP5BSD5cbGkB-7" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=0.88;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.07;entryY=0.4;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="hevnwnW_VP5BSD5cbGkB-3" target="hevnwnW_VP5BSD5cbGkB-6">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
@@ -45,11 +45,33 @@
             <mxPoint x="-2" y="19" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="hevnwnW_VP5BSD5cbGkB-9" value="&lt;div&gt;PSA Wordpress Network&lt;br&gt;&lt;/div&gt;&lt;div&gt;LearningHUB&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="460" y="155" width="250" height="210" as="geometry" />
+        <mxCell id="hevnwnW_VP5BSD5cbGkB-9" value="&lt;div&gt;PSA Wordpress Network&lt;br&gt;&lt;/div&gt;&lt;div&gt;LearningHUB&lt;/div&gt;&lt;div&gt;https://learningcentre.gww.gov.bc.ca/hub/&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="460" y="180" width="350" height="185" as="geometry" />
         </mxCell>
         <mxCell id="hevnwnW_VP5BSD5cbGkB-10" value="Custom wordpress plugin" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
           <mxGeometry x="560" y="310" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="hevnwnW_VP5BSD5cbGkB-17" value="https://learn.bcpublicservice.gov.bc.ca/learning-hub/learning-partner-courses.json" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="210" y="450" width="440" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="hevnwnW_VP5BSD5cbGkB-18" value="https://gww.bcpublicservice.gov.bc.ca/lsapp/course-feed/" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;rotation=-90;" vertex="1" parent="1">
+          <mxGeometry x="-90" y="310" width="310" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="hevnwnW_VP5BSD5cbGkB-19" value="https://learning.gov.bc.ca/psc/CHIPSPLM_3/EMPLOYEE/ELM/q/?ICAction=ICQryNameURL%3DPUBLIC.GBC_ATWORK_CATALOG" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="35" y="30" width="700" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="hevnwnW_VP5BSD5cbGkB-20" value="https://learning.gov.bc.ca/psc/CHIPSPLM_3/EMPLOYEE/ELM/q/?ICAction=ICQryNameURL%3DPUBLIC.GBC_ATWORK_CATALOG_KEYWORDS" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="35" y="50" width="780" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="hevnwnW_VP5BSD5cbGkB-21" value="" style="curved=1;endArrow=classic;html=1;exitX=0.441;exitY=1.1;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="hevnwnW_VP5BSD5cbGkB-20">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="300" as="sourcePoint" />
+            <mxPoint x="230" y="230" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="425" y="200" />
+              <mxPoint x="300" y="280" />
+            </Array>
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
